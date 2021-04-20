@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!--自定义看板娘-->
+  
+  <script src="/live2d-widget/autoload.js"></script>
+  
+  
+  <title itemprop="name">记录一次MC服务器崩溃 | Hexo</title>
+  
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+SerifMerriweather|Merriweather+Sans|Source+Code+Pro|Ubuntu:400,700|Noto+Serif+SC" media="all">
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="stylesheet" id="saukra_css-css" href="/css/style.css" type="text/css" media="all">
+  <link rel="stylesheet" href="/css/lib.min.css" media="all">
+  <link rel="stylesheet" href="/css/font.css" media="all">
+  <link rel="stylesheet" href="/css/insight.css" media="all">
+  <link rel="stylesheet" href="/css/jquery.fancybox.min.css" media="all">
+  <link rel="stylesheet" href="/css/zoom.css" media="all">
+  <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
+<!--   <link rel="stylesheet" id="saukra_css-css" href="https://2heng.xin/wp-content/cache/autoptimize/css/autoptimize_ad42a61f4c7d4bdd9f91afcff6b5dda5.css
+" type="text/css" media="all"> -->
+  <script>
+  /*Initial Variables*/
+  var mashiro_option = new Object();
+  var mashiro_global = new Object();
+  mashiro_option.NProgressON = true;
+  /* 
+   * 邮箱信息之类的东西可以填在这里，这些js变量基本都作用于sakura-app.js
+   * 这样的设置仅是为了方便在基于PHP开发的主题中设置js变量，既然移植到了Node上，我想或许可以精简这一逻辑吧
+   */
+  mashiro_option.email_domain = "";
+  mashiro_option.email_name = "";
+  mashiro_option.cookie_version_control = "";
+  mashiro_option.qzone_autocomplete = false;
+  mashiro_option.site_name = "雨过天晴&伞落人离's Blog";
+  mashiro_option.author_name = "雨过天晴&伞落人离's Blog";
+  mashiro_option.site_url = "https://zwh-china.github.io";
+  mashiro_option.v_appId = "GyC3NzMvd0hT9Yyd2hYIC0MN-gzGzoHsz";
+  mashiro_option.v_appKey = "mgOpfzbkHYqU92CV4IDlAUHQ";
+  mashiro_option.mathjax = "0";
+  mashiro_option.qq_api_url = "https://api.mashiro.top/qqinfo/"; 
+  mashiro_option.qq_avatar_api_url = "https://api.mashiro.top/qqinfo/";
+
+  // mashiro_option.jsdelivr_css_src = "https://cdn.jsdelivr.net/gh/moezx/cdn@3.4.5/css/lib.min.css";
+  // mashiro_option.float_player_on = true;
+
+  /*End of Initial Variables*/
+  </script>
+  <script type="text/javascript">
+  var bg = "https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(1).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(2).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(3).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(4).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(5).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(6).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(8).jpg.webp".split(",");
+  var bgindex = Math.floor(Math.random()*bg.length);
+  if (!!window.ActiveXObject || "ActiveXObject" in window) { //is IE?
+    alert('朋友，IE浏览器未适配哦~');
+  }
+  </script>
+  <style type="text/css">
+  .hljs-ln{border-collapse:collapse}.hljs-ln td{padding:0}.hljs-ln-n:before{content:attr(data-line-number)}
+  </style>
+  <style type="text/css">.site-top .lower nav{display:block !important;}.author-profile i,.post-like a,.post-share .show-share,.sub-text,.we-info a,span.sitename,.post-more i:hover,#pagination a:hover,.post-content a:hover,.float-content i:hover{color:#FE9600}.feature i,.download,.navigator i:hover,.links ul li:before,.ar-time i,span.ar-circle,.object,.comment .comment-reply-link,.siren-checkbox-radio:checked + .siren-checkbox-radioInput:after{background:#FE9600}::-webkit-scrollbar-thumb{background:#FE9600}.download,.navigator i:hover,.link-title,.links ul li:hover,#pagination a:hover,.comment-respond input[type='submit']:hover{border-color:#FE9600}.entry-content a:hover,.site-info a:hover,.comment h4 a,#comments-navi a.prev,#comments-navi a.next,.comment h4 a:hover,.site-top ul li a:hover,.entry-title a:hover,#archives-temp h3,span.page-numbers.current,.sorry li a:hover,.site-title a:hover,i.iconfont.js-toggle-search.iconsearch:hover,.comment-respond input[type='submit']:hover{color:#FE9600}.comments .comments-main{display:block !important;}.comments .comments-hidden{display:none !important;}background-position:center center;background-attachment:inherit;}
+  </style>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="page-template page-template-user page-template-page-analytics page-template-userpage-analytics-php page page-id-1297 chinese-font serif isWebKit">
+  <div class="scrollbar" id="bar">
+  </div>
+  <a href="#" class="cd-top faa-float animated"></a>
+  <section id="main-container">
+    <div class="headertop filter-dot">
+  <div id="banner_wave_1"></div>
+  <div id="banner_wave_2"></div>
+  <figure id="centerbg" class="centerbg">
+    <div class="focusinfo no-select">
+      <div class="header-tou">
+   <h1 class="center-text glitch is-glitching Ubuntu-font" data-text="雨过天晴&伞落人离's Blog">雨过天晴&伞落人离's Blog</h1>
+</div>
+      <div class="header-info">
+        <p>一沙一世界，一花一天堂。君掌盛无边，刹那成永恒。</p>
+        <div class="top-social_v2">
+          <li id="bg-pre">
+            <img class="flipx" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
+          </li>
+          
+            
+              
+                <li>
+                  <a href="http://github.com/honjun" target="_blank" class="social-github" title="github">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/github.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="sina">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/sina.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="wangyiyun">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wangyiyun.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="zhihu">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/zhihu.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="email">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/email.svg">
+                  </a>
+                </li>
+              
+            
+              
+                <li class="wechat">
+                  <a href="/#">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wechat.png">
+                  </a>
+                  <div class="wechatInner">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/wechat.jpg">
+                  </div>
+                </li>
+              
+            
+              
+                <li class="wechat">
+                  <a href="/#">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wechat.png">
+                  </a>
+                  <div class="wechatInner">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/wechat.jpg">
+                  </div>
+                </li>
+              
+            
+          
+          <li id="bg-next">
+            <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
+          </li>
+        </div>
+      </div>
+    </div>
+  </figure>
+  <div id="video-container" style="">
+    <video style="object-fit: fill" id="bgvideo" class="video" video-name="" src="" width="auto" preload="auto">
+    </video>
+    <div id="video-btn" class="loadvideo videolive">
+    </div>
+    <div id="video-add">
+    </div>
+    <div class="video-stu">
+    </div>
+  </div>
+  <div class="headertop-down faa-float animated" onclick="headertop_down()">
+    <span>
+      <i class="fa fa-chevron-down" aria-hidden="true">
+      </i>
+    </span>
+  </div>
+</div>
+    <div id="page" class="site wrapper">
+      <header class="site-header no-select gizle sabit" role="banner">
+  <div class="site-top">
+    <div class="site-branding">
+      <span class="site-title">
+        <span class="logolink moe-mashiro">
+          <a href="/">
+            <span class="sakurasono"></span>
+            <span class="shironeko">雨过天晴&amp;伞落人离&#39;s Blog</span>
+          </a>
+        </span>
+      </span>
+    </div>
+    <div class="searchbox search-form-submit">
+      <i class="iconfont js-toggle-search iconsearch icon-search">
+      </i>
+    </div>
+    <div id="show-nav" class="showNav mobile-fit">
+      <div class="line line1">
+      </div>
+      <div class="line line2">
+      </div>
+      <div class="line line3">
+      </div>
+    </div>
+    <div class="lower-cantiner">
+      <div class="lower">
+        <nav class="mobile-fit-control hide">
+          <ul id="menu-new" class="menu">
+            
+              <li>
+                <a href="/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-fort-awesome faa-shake" aria-hidden="true"></i>
+                    首页
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/archives">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-archive faa-shake" aria-hidden="true"></i>
+                    归档
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/categories/%E6%8A%80%E6%9C%AF/">
+                          <i class="fa fa-code" aria-hidden="true"></i>
+                          技术
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E7%94%9F%E6%B4%BB/">
+                          <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                          生活
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E8%B5%84%E6%BA%90/">
+                          <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                          资源
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E9%9A%8F%E6%83%B3/">
+                          <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                          随想
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E8%BD%AC%E8%BD%BD/">
+                          <i class="fa fa-book" aria-hidden="true"></i>
+                          转载
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="javascript:;">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-list-ul faa-vertical" aria-hidden="true"></i>
+                    清单
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/tags/%E6%82%A6%E8%AF%BB/">
+                          <i class="fa fa-th-list faa-bounce" aria-hidden="true"></i>
+                          书单
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/bangumi/">
+                          <i class="fa fa-film faa-vertical" aria-hidden="true"></i>
+                          番组
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/music/">
+                          <i class="fa fa-headphones" aria-hidden="true"></i>
+                          歌单
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/tags/%E5%9B%BE%E9%9B%86/">
+                          <i class="fa fa-photo" aria-hidden="true"></i>
+                          图集
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="/comment/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-pencil-square-o faa-tada" aria-hidden="true"></i>
+                    留言板
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/links/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-link faa-shake" aria-hidden="true"></i>
+                    友人帐
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/donate/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-heart faa-pulse" aria-hidden="true"></i>
+                    赞赏
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-leaf faa-wrench" aria-hidden="true"></i>
+                    关于
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/about/">
+                          <i class="fa fa-meetup" aria-hidden="true"></i>
+                          我？
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/theme-sakura/">
+                          <i class="fa iconfont icon-sakura" aria-hidden="true"></i>
+                          主题
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/lab/">
+                          <i class="fa fa-cogs" aria-hidden="true"></i>
+                          Lab
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="/client/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-android faa-vertical" aria-hidden="true"></i>
+                    客户端
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/atom.xml">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
+                    RSS
+                  </span>
+                </a>
+                
+              </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+<div class="pattern-center-blank"></div>
+
+<div id="content" class="site-content">
+  <div id="primary" class="content-area">
+    <main id="main" class="site-main" role="main">
+      <article id="post-1" class="post-1 post type-post status-publish format-standard has-post-thumbnail hentry category-uncategorized">
+        <div class="toc"></div>
+        <!--<div class="toc-entry-content"><!-- 套嵌目录使用（主要为了支援评论）-->
+        
+          <header class="entry-header">
+            <h1 class="entry-title">记录一次MC服务器崩溃</h1>
+            <p class="entry-census">&nbsp;·&nbsp;2020-11-1&nbsp;·&nbsp;<span id="busuanzi_value_page_pv"></span>次阅读</p></p>
+
+            <hr>
+          </header>
+        
+        <div class="entry-content">
+          <p>崩溃日志如下</p>
+<p>-— Minecraft Crash Report —-<br>// You’re mean.</p>
+<p>Time: 11/1/20 5:56 PM<br>Description: Watching Server</p>
+<p>java.lang.Error<br>at java.util.stream.IntPipeline$4$1.accept(Unknown Source)<br>at java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Unknown Source)<br>at java.util.Spliterator$OfInt.forEachRemaining(Unknown Source)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(Unknown Source)<br>at com.google.common.collect.CollectSpliterators$1WithCharacteristics.forEachRemaining(CollectSpliterators.java:65)<br>at java.util.stream.ReferencePipeline$Head.forEach(Unknown Source)<br>at java.util.stream.ReferencePipeline$7$1.accept(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator$$Lambda$1630/1997267152.accept(Unknown Source)<br>at java.util.stream.IntPipeline$4$1.accept(Unknown Source)<br>at java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Unknown Source)<br>at java.util.Spliterator$OfInt.forEachRemaining(Unknown Source)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(Unknown Source)<br>at com.google.common.collect.CollectSpliterators$1WithCharacteristics.forEachRemaining(CollectSpliterators.java:65)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)<br>at java.util.stream.AbstractPipeline.evaluate(Unknown Source)<br>at java.util.stream.ReferencePipeline.collect(Unknown Source)<br>at boo.b(SourceFile:112)<br>at acs.a(SourceFile:187)<br>at aba.c(SourceFile:111)<br>at aba.b(SourceFile:63)<br>at nd.a(SourceFile:230)<br>at aax.c(SourceFile:173)<br>at net.minecraft.server.MinecraftServer.b(SourceFile:879)<br>at zg.b(SourceFile:303)<br>at net.minecraft.server.MinecraftServer.a(SourceFile:808)<br>at net.minecraft.server.MinecraftServer.w(SourceFile:667)<br>at net.minecraft.server.MinecraftServer.a(SourceFile:254)<br>at net.minecraft.server.MinecraftServer$$Lambda$3304/1905868474.run(Unknown Source)<br>at java.lang.Thread.run(Unknown Source)</p>
+<h2 id="A-detailed-walkthrough-of-the-error-its-code-path-and-all-known-details-is-as-follows"><a href="#A-detailed-walkthrough-of-the-error-its-code-path-and-all-known-details-is-as-follows" class="headerlink" title="A detailed walkthrough of the error, its code path and all known details is as follows:"></a>A detailed walkthrough of the error, its code path and all known details is as follows:</h2><p>-- Head –<br>Thread: Server Watchdog<br>Stacktrace:<br>at java.util.stream.IntPipeline$4$1.accept(Unknown Source)<br>at java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Unknown Source)<br>at java.util.Spliterator$OfInt.forEachRemaining(Unknown Source)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(Unknown Source)<br>at com.google.common.collect.CollectSpliterators$1WithCharacteristics.forEachRemaining(CollectSpliterators.java:65)<br>at java.util.stream.ReferencePipeline$Head.forEach(Unknown Source)<br>at java.util.stream.ReferencePipeline$7$1.accept(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator$$Lambda$1630/1997267152.accept(Unknown Source)<br>at java.util.stream.IntPipeline$4$1.accept(Unknown Source)<br>at java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Unknown Source)<br>at java.util.Spliterator$OfInt.forEachRemaining(Unknown Source)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(Unknown Source)<br>at com.google.common.collect.CollectSpliterators$1WithCharacteristics.forEachRemaining(CollectSpliterators.java:65)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)<br>at java.util.stream.AbstractPipeline.evaluate(Unknown Source)<br>at java.util.stream.ReferencePipeline.collect(Unknown Source)<br>at boo.b(SourceFile:112)<br>at acs.a(SourceFile:187)<br>at aba.c(SourceFile:111)<br>at aba.b(SourceFile:63)<br>at nd.a(SourceFile:230)<br>at aax.c(SourceFile:173)<br>at net.minecraft.server.MinecraftServer.b(SourceFile:879)<br>at zg.b(SourceFile:303)<br>at net.minecraft.server.MinecraftServer.a(SourceFile:808)<br>at net.minecraft.server.MinecraftServer.w(SourceFile:667)<br>at net.minecraft.server.MinecraftServer.a(SourceFile:254)</p>
+<p>-- Thread Dump –<br>Details:<br>Threads: “Netty Server IO #63” Id=733 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #62” Id=732 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #61” Id=731 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #60” Id=730 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #59” Id=729 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #58” Id=728 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #57” Id=727 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #56” Id=726 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #55” Id=725 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #54” Id=724 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #53” Id=723 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #52” Id=722 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #51” Id=721 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #50” Id=720 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #49” Id=719 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #48” Id=718 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #47” Id=717 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #46” Id=716 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #45” Id=715 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #44” Id=714 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #43” Id=713 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #42” Id=712 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #41” Id=711 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #40” Id=710 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #39” Id=709 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #38” Id=708 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“Netty Server IO #37” Id=704 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@2eae9c90<br>- locked java.util.Collections$UnmodifiableSet@2a910d9d<br>- locked sun.nio.ch.WindowsSelectorImpl@6f9396ab<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #36” Id=703 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@4a6dbba<br>- locked java.util.Collections$UnmodifiableSet@5e369da2<br>- locked sun.nio.ch.WindowsSelectorImpl@7ce98e1c<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #35” Id=679 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@fbc69e4<br>- locked java.util.Collections$UnmodifiableSet@3d7518a2<br>- locked sun.nio.ch.WindowsSelectorImpl@57445923<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #34” Id=652 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@67eda4b9<br>- locked java.util.Collections$UnmodifiableSet@bf212e9<br>- locked sun.nio.ch.WindowsSelectorImpl@1e57bb3d<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #33” Id=614 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@6baf6495<br>- locked java.util.Collections$UnmodifiableSet@616ddd35<br>- locked sun.nio.ch.WindowsSelectorImpl@7a13feab<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #32” Id=552 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@59be3c87<br>- locked java.util.Collections$UnmodifiableSet@49a560e9<br>- locked sun.nio.ch.WindowsSelectorImpl@46ae989d<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #31” Id=544 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@232dc045<br>- locked java.util.Collections$UnmodifiableSet@b5f8aa3<br>- locked sun.nio.ch.WindowsSelectorImpl@699f1109<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #30” Id=408 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@5b4716d7<br>- locked java.util.Collections$UnmodifiableSet@16a5da12<br>- locked sun.nio.ch.WindowsSelectorImpl@61d850f7<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #29” Id=407 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@70de029c<br>- locked java.util.Collections$UnmodifiableSet@134c43fe<br>- locked sun.nio.ch.WindowsSelectorImpl@2b816ecf<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #28” Id=403 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@8fddca0<br>- locked java.util.Collections$UnmodifiableSet@837f5c1<br>- locked sun.nio.ch.WindowsSelectorImpl@7995148a<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #27” Id=359 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@5942ea61<br>- locked java.util.Collections$UnmodifiableSet@3fbc3535<br>- locked sun.nio.ch.WindowsSelectorImpl@89256fe<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #26” Id=313 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@59f23222<br>- locked java.util.Collections$UnmodifiableSet@172dda9f<br>- locked sun.nio.ch.WindowsSelectorImpl@49e650d2<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #25” Id=312 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@53d9cab6<br>- locked java.util.Collections$UnmodifiableSet@1bf291cd<br>- locked sun.nio.ch.WindowsSelectorImpl@6272590e<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #24” Id=311 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@19e9e552<br>- locked java.util.Collections$UnmodifiableSet@47810a3<br>- locked sun.nio.ch.WindowsSelectorImpl@b0b9518<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #23” Id=294 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@7bc1075e<br>- locked java.util.Collections$UnmodifiableSet@2d54be01<br>- locked sun.nio.ch.WindowsSelectorImpl@696d4e00<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #22” Id=293 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@3e99a560<br>- locked java.util.Collections$UnmodifiableSet@4d11be1a<br>- locked sun.nio.ch.WindowsSelectorImpl@453db50f<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #21” Id=292 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@46a3eee6<br>- locked java.util.Collections$UnmodifiableSet@3562e1f7<br>- locked sun.nio.ch.WindowsSelectorImpl@75c3782f<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #20” Id=291 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@5dfe3e55<br>- locked java.util.Collections$UnmodifiableSet@4f33fd2<br>- locked sun.nio.ch.WindowsSelectorImpl@263c1be2<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #19” Id=290 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@48d01d0a<br>- locked java.util.Collections$UnmodifiableSet@64709ed3<br>- locked sun.nio.ch.WindowsSelectorImpl@79603020<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #18” Id=289 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@3f45d7e5<br>- locked java.util.Collections$UnmodifiableSet@7735b54a<br>- locked sun.nio.ch.WindowsSelectorImpl@17532b79<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #17” Id=288 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@6fcaf883<br>- locked java.util.Collections$UnmodifiableSet@7ea1f060<br>- locked sun.nio.ch.WindowsSelectorImpl@2464951b<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #16” Id=287 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@2ae26a0d<br>- locked java.util.Collections$UnmodifiableSet@12d48132<br>- locked sun.nio.ch.WindowsSelectorImpl@630751f8<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #15” Id=286 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@634bccce<br>- locked java.util.Collections$UnmodifiableSet@5ac070a8<br>- locked sun.nio.ch.WindowsSelectorImpl@6cabb7d3<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #14” Id=236 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@35fab32f<br>- locked java.util.Collections$UnmodifiableSet@8ea24e2<br>- locked sun.nio.ch.WindowsSelectorImpl@51f65067<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #13” Id=219 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@605260a5<br>- locked java.util.Collections$UnmodifiableSet@d1d44b<br>- locked sun.nio.ch.WindowsSelectorImpl@59452d87<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #12” Id=209 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@3ad33ba0<br>- locked java.util.Collections$UnmodifiableSet@49f73317<br>- locked sun.nio.ch.WindowsSelectorImpl@470ad5ee<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #11” Id=208 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@3753e19d<br>- locked java.util.Collections$UnmodifiableSet@147ed2ec<br>- locked sun.nio.ch.WindowsSelectorImpl@646134ff<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #10” Id=198 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@75d53838<br>- locked java.util.Collections$UnmodifiableSet@5d226016<br>- locked sun.nio.ch.WindowsSelectorImpl@3f2920ec<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #9” Id=166 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@52822d3a<br>- locked java.util.Collections$UnmodifiableSet@e4acbaa<br>- locked sun.nio.ch.WindowsSelectorImpl@40a628a5<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #8” Id=165 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@36fe4e1d<br>- locked java.util.Collections$UnmodifiableSet@75565e05<br>- locked sun.nio.ch.WindowsSelectorImpl@2d99dc9e<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #7” Id=124 RUNNABLE<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@5c0b2a88<br>- locked java.util.Collections$UnmodifiableSet@184119b2<br>- locked sun.nio.ch.WindowsSelectorImpl@5f20cac9<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #6” Id=72 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@3c3e809f<br>- locked java.util.Collections$UnmodifiableSet@39e4a2fa<br>- locked sun.nio.ch.WindowsSelectorImpl@2978a0fd<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #5” Id=70 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@70d75199<br>- locked java.util.Collections$UnmodifiableSet@38a50d64<br>- locked sun.nio.ch.WindowsSelectorImpl@244a9bf8<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #4” Id=69 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@48d9b8c4<br>- locked java.util.Collections$UnmodifiableSet@2c873df<br>- locked sun.nio.ch.WindowsSelectorImpl@129690cf<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #3” Id=61 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@62f34c3e<br>- locked java.util.Collections$UnmodifiableSet@6769c73c<br>- locked sun.nio.ch.WindowsSelectorImpl@267e0685<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #2” Id=54 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@48ea6d<br>- locked java.util.Collections$UnmodifiableSet@7822d4e6<br>- locked sun.nio.ch.WindowsSelectorImpl@51dbacf9<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Netty Server IO #1” Id=53 RUNNABLE (in native)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll0(Native Method)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.poll(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl$SubSelector.access$400(Unknown Source)<br>at sun.nio.ch.WindowsSelectorImpl.doSelect(Unknown Source)<br>at sun.nio.ch.SelectorImpl.lockAndDoSelect(Unknown Source)<br>- locked io.netty.channel.nio.SelectedSelectionKeySet@7c7d269<br>- locked java.util.Collections$UnmodifiableSet@401b5b7e<br>- locked sun.nio.ch.WindowsSelectorImpl@2ef0327f<br>at sun.nio.ch.SelectorImpl.select(Unknown Source)<br>at io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)<br>at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:756)<br>…</p>
+<p>“Java2D Disposer” Id=51 WAITING on java.lang.ref.ReferenceQueue$Lock@2240ef3c<br>at java.lang.Object.wait(Native Method)<br>- waiting on java.lang.ref.ReferenceQueue$Lock@2240ef3c<br>at java.lang.ref.ReferenceQueue.remove(Unknown Source)<br>at java.lang.ref.ReferenceQueue.remove(Unknown Source)<br>at sun.java2d.Disposer.run(Unknown Source)<br>at java.lang.Thread.run(Unknown Source)</p>
+<p>“Server Watchdog” Id=50 RUNNABLE<br>at sun.management.ThreadImpl.dumpThreads0(Native Method)<br>at sun.management.ThreadImpl.dumpAllThreads(Unknown Source)<br>at zj.run(SourceFile:45)<br>at java.lang.Thread.run(Unknown Source)</p>
+<p>“Query Listener #1” Id=49 RUNNABLE<br>at java.net.DualStackPlainDatagramSocketImpl.socketReceiveOrPeekData(Native Method)<br>at java.net.DualStackPlainDatagramSocketImpl.receive0(Unknown Source)<br>at java.net.AbstractPlainDatagramSocketImpl.receive(Unknown Source)<br>- locked java.net.DualStackPlainDatagramSocketImpl@1bad2587<br>at java.net.DatagramSocket.receive(Unknown Source)<br>- locked java.net.DatagramPacket@1f75d27<br>- locked java.net.DatagramSocket@2e3bf4ac<br>at adh.run(SourceFile:258)<br>at java.lang.Thread.run(Unknown Source)</p>
+<p>“Netty Server IO #0” Id=46 BLOCKED on java.util.Collections$SynchronizedRandomAccessList@206966ed owned by “Server thread” Id=40<br>at java.util.Collections$SynchronizedCollection.add(Unknown Source)<br>- blocked on java.util.Collections$SynchronizedRandomAccessList@206966ed<br>at aax$1.initChannel(SourceFile:108)<br>at io.netty.channel.ChannelInitializer.initChannel(ChannelInitializer.java:113)<br>at io.netty.channel.ChannelInitializer.handlerAdded(ChannelInitializer.java:105)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAdded0(DefaultChannelPipeline.java:637)<br>at io.netty.channel.DefaultChannelPipeline.access$000(DefaultChannelPipeline.java:46)<br>at io.netty.channel.DefaultChannelPipeline$PendingHandlerAddedTask.execute(DefaultChannelPipeline.java:1487)<br>at io.netty.channel.DefaultChannelPipeline.callHandlerAddedForAllHandlers(DefaultChannelPipeline.java:1161)<br>…</p>
+<p>“ObjectCleanerThread” Id=45 TIMED_WAITING on java.lang.ref.ReferenceQueue$Lock@b27d758<br>at java.lang.Object.wait(Native Method)<br>- waiting on java.lang.ref.ReferenceQueue$Lock@b27d758<br>at java.lang.ref.ReferenceQueue.remove(Unknown Source)<br>at io.netty.util.internal.ObjectCleaner$1.run(ObjectCleaner.java:54)<br>at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)<br>at java.lang.Thread.run(Unknown Source)</p>
+<p>“DestroyJavaVM” Id=44 RUNNABLE</p>
+<p>“Server console handler” Id=43 RUNNABLE (in native)<br>at java.io.FileInputStream.readBytes(Native Method)<br>at java.io.FileInputStream.read(Unknown Source)<br>at java.io.BufferedInputStream.read1(Unknown Source)<br>at java.io.BufferedInputStream.read(Unknown Source)<br>- locked java.io.BufferedInputStream@79545aa6<br>at sun.nio.cs.StreamDecoder.readBytes(Unknown Source)<br>at sun.nio.cs.StreamDecoder.implRead(Unknown Source)<br>at sun.nio.cs.StreamDecoder.read(Unknown Source)<br>- locked java.io.InputStreamReader@42f12ece<br>at java.io.InputStreamReader.read(Unknown Source)<br>…</p>
+<p>“Server thread” Id=40 RUNNABLE<br>at java.util.stream.IntPipeline$4$1.accept(Unknown Source)<br>at java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Unknown Source)<br>at java.util.Spliterator$OfInt.forEachRemaining(Unknown Source)<br>at java.util.stream.AbstractPipeline.copyInto(Unknown Source)<br>at java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)<br>at java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(Unknown Source)<br>at com.google.common.collect.CollectSpliterators$1WithCharacteristics.forEachRemaining(CollectSpliterators.java:65)<br>at java.util.stream.ReferencePipeline$Head.forEach(Unknown Source)<br>…</p>
+<p>“Snooper Timer” Id=41 WAITING on java.util.TaskQueue@331e3ca8<br>at java.lang.Object.wait(Native Method)<br>- waiting on java.util.TaskQueue@331e3ca8<br>at java.lang.Object.wait(Unknown Source)<br>at java.util.TimerThread.mainLoop(Unknown Source)<br>at java.util.TimerThread.run(Unknown Source)</p>
+<p>“Timer hack thread” Id=32 TIMED_WAITING<br>at java.lang.Thread.sleep(Native Method)<br>at x$6.run(SourceFile:636)</p>
+<p>“Attach Listener” Id=5 RUNNABLE</p>
+<p>“Signal Dispatcher” Id=4 RUNNABLE</p>
+<p>“Finalizer” Id=3 WAITING on java.lang.ref.ReferenceQueue$Lock@636a084<br>at java.lang.Object.wait(Native Method)<br>- waiting on java.lang.ref.ReferenceQueue$Lock@636a084<br>at java.lang.ref.ReferenceQueue.remove(Unknown Source)<br>at java.lang.ref.ReferenceQueue.remove(Unknown Source)<br>at java.lang.ref.Finalizer$FinalizerThread.run(Unknown Source)</p>
+<p>“Reference Handler” Id=2 WAITING on java.lang.ref.Reference$Lock@5d6c4b8e<br>at java.lang.Object.wait(Native Method)<br>- waiting on java.lang.ref.Reference$Lock@5d6c4b8e<br>at java.lang.Object.wait(Unknown Source)<br>at java.lang.ref.Reference.tryHandlePending(Unknown Source)<br>at java.lang.ref.Reference$ReferenceHandler.run(Unknown Source)</p>
+<p>Stacktrace:<br>at zj.run(SourceFile:61)<br>at java.lang.Thread.run(Unknown Source)</p>
+<p>-- System Details –<br>Details:<br>Minecraft Version: 1.16.2<br>Minecraft Version ID: 1.16.2<br>Operating System: Windows 10 (amd64) version 10.0<br>Java Version: 1.8.0_141, Oracle Corporation<br>Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation<br>Memory: 4599614408 bytes (4386 MB) / 6228017152 bytes (5939 MB) up to 19088801792 bytes (18204 MB)<br>CPUs: 32<br>JVM Flags: 2 total; -Xms4G -Xmx20G<br>Player Count: 2 / 20; [aah[‘Fever_King’/52754, l=’ServerLevel[world]‘, x=-116.44, y=121.00, z=-246.73], aah[‘Alpha___EX’/55209, l=’ServerLevel[world]‘, x=-491.94, y=188.00, z=193.01]]<br>Data Packs: vanilla<br>Is Modded: Unknown (can’t tell)<br>Type: Dedicated Server (map_server.txt)</p>
+
+        </div>
+        <!-- .entry-content -->
+        <div class="single-reward">
+          <div class="reward-open">赏
+            <div class="reward-main">
+              <ul class="reward-row">
+                <li class="alipay-code"><img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/donate/AliPayQR.jpg"></li>
+                <li class="wechat-code"><img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/donate/WeChanQR.jpg"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; width: 100%" class="social-share share-mobile" data-disabled="diandian, tencent"></div>
+        <footer class="post-footer">
+          <div class="post-lincenses"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="nofollow"><i class="fa fa-creative-commons" aria-hidden="true"></i> 知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a></div>
+          <div class="post-tags">
+          </div>
+          <div class="post-share">
+            <div class="social-share sharehidden share-component"></div>
+            <i class="iconfont show-share icon-forward"></i>
+          </div>
+        </footer><!-- .entry-footer -->
+      </article>
+      <!-- #post-## -->
+      <div class="toc" style="background: none;"></div>
+      <section class="post-squares nextprev">
+        
+          
+            <div class="post-nepre half previous">
+          
+            <a href="/2020/11/10/%E8%BD%AC%E8%BD%BDpython%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%8C%B9%E9%85%8D%E5%8F%8D%E6%96%9C%E6%9D%A0%E9%97%AE%E9%A2%98/" rel="prev">
+              <div class="background">
+                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Previous Post</span>
+              <div class="info">
+                <h3>
+                转-Python正则表达式匹配反斜杠问题</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+        
+          
+            <div class="post-nepre half next">
+          
+            <a href="/2020/10/12/cuit%E7%94%9F%E6%B4%BB%E4%BD%93%E9%AA%8C/" rel="next">
+              <div class="background">
+                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Next Post</span>
+              <div class="info">
+                <h3>
+                CUIT生活体验</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+      </section>
+      
+<div id="vcomments"></div>
+<script>
+  window.onload = function(){
+      var valine = new Valine();
+      valine.init({
+        el: '#vcomments',
+        appId: "GyC3NzMvd0hT9Yyd2hYIC0MN-gzGzoHsz",
+        appKey: "mgOpfzbkHYqU92CV4IDlAUHQ",
+        path: window.location.pathname,
+        placeholder: "你是我一生只会遇见一次的惊喜 ..."
+      })
+  }
+</script>
+
+      <section class="author-profile">
+        <div class="info" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+          <a href="" class="profile gravatar"><img src="" itemprop="image" alt="" height="70" width="70"></a>
+          <div class="meta">
+            <span class="title">Author</span>
+            <h3 itemprop="name">
+            <a href="" itemprop="url" rel="author"></a>
+            </h3>
+          </div>
+        </div>
+        <hr>
+        <p><i class="iconfont icon-write"></i></p>
+      </section>
+    </main><!-- #main -->
+  </div><!-- #primary -->
+</div>
+
+
+
+    </div>    
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..."/>
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            // PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+    <!-- <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 John Doe<br>
+      powered_by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer> -->
+<footer id="colophon" class="site-footer" role="contentinfo">
+  <div class="site-info">
+    <div class="footertext">
+      <div class="img-preload">
+        <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/wordpress-rotating-ball-o.svg">
+        <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/disqus-preloader.svg">
+      </div>
+      <p style="color: #666666;">&copy 2018</p>
+    </div>
+    <div class="footer-device">
+    <p style="font-family: 'Ubuntu', sans-serif;">
+        <span style="color: #b9b9b9;">Theme <a href="https://github.com/honjun/hexo-theme-sakura" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Sakura</a> <i class="iconfont icon-sakura rotating" style="color: #ffc0cb;display:inline-block"></i> by <a href="https://2heng.xin/" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Mashiro</a>&<a href="https://www.hojun.cn/" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Hojun</a>, Powered by Hexo, Hosted by Coding Pages</a>
+        </span>
+      </p>
+    </div>
+  </div><!-- .site-info -->
+</footer>
+
+
+
+<!-- <script src="/js/tocbot.js"></script> -->
+<script type="text/javascript" src="/js/lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script type="text/javascript" src="/js/InsightSearch.js"></script>
+<script type="text/javascript" src="/js/jquery.fancybox.min.js"></script>
+<script type="text/javascript" src="/js/zoom.min.js"></script>
+<script type="text/javascript" src="/js/sakura-app.js"></script>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//unpkg.com/valine@1.3.4/dist/Valine.min.js'></script>
+<script src="/js/botui.js"></script>
+<!-- 不蒜子 网页计数器 -->
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script> -->
+<script type="text/javascript">
+/* <![CDATA[ */
+if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  var Poi = {"pjax":"1","movies":{"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2","name":"Unbroken.mp4","live":"close"},"windowheight":"fixed","codelamp":"close","ajaxurl":"","order":"asc","formpostion":"bottom"};
+} else {
+  var Poi = {"pjax":"1","movies":{"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2","name":"Unbroken.mp4","live":"open"},"windowheight":"auto","codelamp":"close","ajaxurl":"","order":"asc","formpostion":"bottom"};
+}
+/* ]]> */
+
+</script>
+<script>
+$(document).ready(function() {
+  if ($(".toc").length > 0 && document.body.clientWidth > 1200) {
+    if ($(".pattern-center").length > 0) { //有图的情况
+      tocbot.init({
+          // Where to render the table of contents.
+          tocSelector: '.toc', // 放置目录的容器
+          // Where to grab the headings to build the table of contents.
+          contentSelector: '.entry-content', // 正文内容所在
+          // Which headings to grab inside of the contentSelector element.
+          scrollSmooth: true,
+          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
+          headingsOffset: -400,
+          scrollSmoothOffset: -85
+      });
+    } else {
+      tocbot.init({
+          // Where to render the table of contents.
+          tocSelector: '.toc', // 放置目录的容器
+          // Where to grab the headings to build the table of contents.
+          contentSelector: '.entry-content', // 正文内容所在
+          // Which headings to grab inside of the contentSelector element.
+          scrollSmooth: true,
+          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
+          headingsOffset: -85,
+          scrollSmoothOffset: -85
+      });
+    }
+    var offsetTop = $('.toc').offset().top - 95;
+    window.onscroll = function() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+      if (scrollTop >= offsetTop) {
+        $('.toc').addClass('toc-fixed');
+      } else {
+        $('.toc').removeClass('toc-fixed');
+      }
+    }
+  }
+});
+</script>
+<!-- 🌸飘落 -->
+<script src="https://cdn.jsdelivr.net/gh/wallleap/cdn@latest/js/sakura.js"></script>
+    <div class="openNav no-select" style="height: 50px;">
+      <div class="iconflat no-select" style="width: 50px; height: 50px;">
+        <div class="icon"></div>
+      </div>
+      <div class="site-branding search-form-submit">
+        <i class="iconfont js-toggle-search iconsearch icon-search"></i>
+      </div>
+    </div>
+  </section>
+  <div class="skin-menu no-select" id="mainskin" style="position: fixed">
+ <div class="theme-controls row-container">
+  <ul class="menu-list">
+   <li id="white-bg"> <i class="fa fa-television" aria-hidden="true"></i></li>
+   <li id="sakura-bg"> <i class="iconfont icon-sakura"></i></li>
+   <li id="gribs-bg"> <i class="fa fa-slack" aria-hidden="true"></i></li>
+   <li id="KAdots-bg"> <i class="iconfont icon-dots"></i></li>
+   <li id="totem-bg"> <i class="fa fa-optin-monster" aria-hidden="true"></i></li>
+   <li id="pixiv-bg"> <i class="iconfont icon-pixiv"></i></li>
+   <li id="bing-bg"> <i class="iconfont icon-bing"></i></li>
+   <li id="dark-bg"> <i class="fa fa-moon-o" aria-hidden="true"></i></li>
+  </ul>
+ </div>
+</div>
+<canvas id="night-mode-cover"></canvas> 
+  <div class="changeSkin-gear no-select">
+  <div class="keys" id="setbtn"> 
+   <span id="open-skinMenu"> 切换主题 | SCHEME TOOL  
+     <i class="iconfont icon-gear inline-block rotating"></i> 
+   </span>
+  </div>
+</div>
+  <div id="mo-nav" class="">
+  <div class="m-avatar">
+    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/avatar.jpg">
+  </div>
+  <p style="text-align: center; color: #333; font-weight: 900; font-family: 'Ubuntu', sans-serif; letter-spacing: 1.5px">雨过天晴&伞落人离's Blog</p>
+  <p style="text-align: center; word-spacing: 20px;">
+    
+      
+        <a href="http://github.com/honjun" class="fa fa-github" target="_blank" style="color: #333; margin-left:20px"></a>
+      
+        <a href="http://weibo.com/mashirozx?is_all=1" class="fa fa-weibo" target="_blank" style="color: #dd4b39; margin-left:20px"></a>
+      
+        <a href="https://wpa.qq.com/msgrd?v=3&uin=954655431&site=qq&menu=yes" class="fa fa-qq" target="_blank" style="color: #25c6fe; margin-left:20px"></a>
+      
+    
+  </p>
+  <ul id="menu-new-1" class="menu">
+    
+      <li>
+        <a href="/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-fort-awesome faa-shake" aria-hidden="true"></i>
+            首页
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/archives">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-archive faa-shake" aria-hidden="true"></i>
+            归档
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/categories/%E6%8A%80%E6%9C%AF/">
+                  <i class="fa fa-code" aria-hidden="true"></i>
+                  技术
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E7%94%9F%E6%B4%BB/">
+                  <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                  生活
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E8%B5%84%E6%BA%90/">
+                  <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                  资源
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E9%9A%8F%E6%83%B3/">
+                  <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                  随想
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E8%BD%AC%E8%BD%BD/">
+                  <i class="fa fa-book" aria-hidden="true"></i>
+                  转载
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="javascript:;">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-list-ul faa-vertical" aria-hidden="true"></i>
+            清单
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/tags/%E6%82%A6%E8%AF%BB/">
+                  <i class="fa fa-th-list faa-bounce" aria-hidden="true"></i>
+                  书单
+                </a>
+              </li>
+            
+              <li>
+                <a href="/bangumi/">
+                  <i class="fa fa-film faa-vertical" aria-hidden="true"></i>
+                  番组
+                </a>
+              </li>
+            
+              <li>
+                <a href="/music/">
+                  <i class="fa fa-headphones" aria-hidden="true"></i>
+                  歌单
+                </a>
+              </li>
+            
+              <li>
+                <a href="/tags/%E5%9B%BE%E9%9B%86/">
+                  <i class="fa fa-photo" aria-hidden="true"></i>
+                  图集
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="/comment/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-pencil-square-o faa-tada" aria-hidden="true"></i>
+            留言板
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/links/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-link faa-shake" aria-hidden="true"></i>
+            友人帐
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/donate/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-heart faa-pulse" aria-hidden="true"></i>
+            赞赏
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-leaf faa-wrench" aria-hidden="true"></i>
+            关于
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/about/">
+                  <i class="fa fa-meetup" aria-hidden="true"></i>
+                  我？
+                </a>
+              </li>
+            
+              <li>
+                <a href="/theme-sakura/">
+                  <i class="fa iconfont icon-sakura" aria-hidden="true"></i>
+                  主题
+                </a>
+              </li>
+            
+              <li>
+                <a href="/lab/">
+                  <i class="fa fa-cogs" aria-hidden="true"></i>
+                  Lab
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="/client/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-android faa-vertical" aria-hidden="true"></i>
+            客户端
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/atom.xml">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
+            RSS
+          </span>
+        </a>
+        
+      </li>
+    
+  </ul>
+  <p style="text-align: center; font-size: 13px; color: #b9b9b9;">&copy 2019 hexo-sakura</p>
+</div>
+<button onclick="topFunction()" class="mobile-cd-top" id="moblieGoTop" title="Go to top" style="display: none;"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<!-- require MetingJS -->
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+<style>
+  .aplayer .aplayer-lrc {
+    height: 35px;
+  }
+  .aplayer .aplayer-lrc p{
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 18px !important;
+  }
+  .aplayer .aplayer-lrc p.aplayer-lrc-current{
+    color: #FF1493;
+  }
+  .aplayer.aplayer-narrow .aplayer-body{
+    left: -66px !important;
+  }
+  .aplayer.aplayer-fixed .aplayer-lrc {
+    display: none;
+  }
+  .aplayer .aplayer-lrc.aplayer-lrc-hide {
+      display:none !important;
+  }
+  .aplayer.aplayer-fixed .lrc-show {
+    display: block;
+    background: rgba(255, 255, 255, 0.8);
+  }
+</style>
+<meting-js
+
+    id="606130066"
+
+    server="netease"
+
+    type="playlist"
+
+    fixed="true"
+
+    autoplay="false"
+
+    loop="all"
+
+    order="random"
+
+    preload="auto"
+
+    volume="0.7"
+
+    mutex="true"
+
+</meting-js>
+<script>
+  $(function(){
+    $('body').on('click', '.aplayer', function(){
+      if($('.aplayer-button').hasClass('aplayer-play')) {
+        $('.aplayer-lrc').removeClass('lrc-show');
+      } else {
+        $('.aplayer-lrc').addClass('lrc-show');
+      }
+    })
+  });
+</script>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>

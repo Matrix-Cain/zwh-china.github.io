@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!--自定义看板娘-->
+  
+  <script src="/live2d-widget/autoload.js"></script>
+  
+  
+  <title itemprop="name">初识dll热补丁 | Hexo</title>
+  
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+SerifMerriweather|Merriweather+Sans|Source+Code+Pro|Ubuntu:400,700|Noto+Serif+SC" media="all">
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="stylesheet" id="saukra_css-css" href="/css/style.css" type="text/css" media="all">
+  <link rel="stylesheet" href="/css/lib.min.css" media="all">
+  <link rel="stylesheet" href="/css/font.css" media="all">
+  <link rel="stylesheet" href="/css/insight.css" media="all">
+  <link rel="stylesheet" href="/css/jquery.fancybox.min.css" media="all">
+  <link rel="stylesheet" href="/css/zoom.css" media="all">
+  <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
+<!--   <link rel="stylesheet" id="saukra_css-css" href="https://2heng.xin/wp-content/cache/autoptimize/css/autoptimize_ad42a61f4c7d4bdd9f91afcff6b5dda5.css
+" type="text/css" media="all"> -->
+  <script>
+  /*Initial Variables*/
+  var mashiro_option = new Object();
+  var mashiro_global = new Object();
+  mashiro_option.NProgressON = true;
+  /* 
+   * 邮箱信息之类的东西可以填在这里，这些js变量基本都作用于sakura-app.js
+   * 这样的设置仅是为了方便在基于PHP开发的主题中设置js变量，既然移植到了Node上，我想或许可以精简这一逻辑吧
+   */
+  mashiro_option.email_domain = "";
+  mashiro_option.email_name = "";
+  mashiro_option.cookie_version_control = "";
+  mashiro_option.qzone_autocomplete = false;
+  mashiro_option.site_name = "雨过天晴&伞落人离's Blog";
+  mashiro_option.author_name = "雨过天晴&伞落人离's Blog";
+  mashiro_option.site_url = "https://zwh-china.github.io";
+  mashiro_option.v_appId = "GyC3NzMvd0hT9Yyd2hYIC0MN-gzGzoHsz";
+  mashiro_option.v_appKey = "mgOpfzbkHYqU92CV4IDlAUHQ";
+  mashiro_option.mathjax = "0";
+  mashiro_option.qq_api_url = "https://api.mashiro.top/qqinfo/"; 
+  mashiro_option.qq_avatar_api_url = "https://api.mashiro.top/qqinfo/";
+
+  // mashiro_option.jsdelivr_css_src = "https://cdn.jsdelivr.net/gh/moezx/cdn@3.4.5/css/lib.min.css";
+  // mashiro_option.float_player_on = true;
+
+  /*End of Initial Variables*/
+  </script>
+  <script type="text/javascript">
+  var bg = "https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(1).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(2).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(3).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(4).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(5).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(6).jpg.webp,https://cdn.jsdelivr.net/gh/yremp/cdn@2.1.5/img/cover/(8).jpg.webp".split(",");
+  var bgindex = Math.floor(Math.random()*bg.length);
+  if (!!window.ActiveXObject || "ActiveXObject" in window) { //is IE?
+    alert('朋友，IE浏览器未适配哦~');
+  }
+  </script>
+  <style type="text/css">
+  .hljs-ln{border-collapse:collapse}.hljs-ln td{padding:0}.hljs-ln-n:before{content:attr(data-line-number)}
+  </style>
+  <style type="text/css">.site-top .lower nav{display:block !important;}.author-profile i,.post-like a,.post-share .show-share,.sub-text,.we-info a,span.sitename,.post-more i:hover,#pagination a:hover,.post-content a:hover,.float-content i:hover{color:#FE9600}.feature i,.download,.navigator i:hover,.links ul li:before,.ar-time i,span.ar-circle,.object,.comment .comment-reply-link,.siren-checkbox-radio:checked + .siren-checkbox-radioInput:after{background:#FE9600}::-webkit-scrollbar-thumb{background:#FE9600}.download,.navigator i:hover,.link-title,.links ul li:hover,#pagination a:hover,.comment-respond input[type='submit']:hover{border-color:#FE9600}.entry-content a:hover,.site-info a:hover,.comment h4 a,#comments-navi a.prev,#comments-navi a.next,.comment h4 a:hover,.site-top ul li a:hover,.entry-title a:hover,#archives-temp h3,span.page-numbers.current,.sorry li a:hover,.site-title a:hover,i.iconfont.js-toggle-search.iconsearch:hover,.comment-respond input[type='submit']:hover{color:#FE9600}.comments .comments-main{display:block !important;}.comments .comments-hidden{display:none !important;}background-position:center center;background-attachment:inherit;}
+  </style>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="page-template page-template-user page-template-page-analytics page-template-userpage-analytics-php page page-id-1297 chinese-font serif isWebKit">
+  <div class="scrollbar" id="bar">
+  </div>
+  <a href="#" class="cd-top faa-float animated"></a>
+  <section id="main-container">
+    <div class="headertop filter-dot">
+  <div id="banner_wave_1"></div>
+  <div id="banner_wave_2"></div>
+  <figure id="centerbg" class="centerbg">
+    <div class="focusinfo no-select">
+      <div class="header-tou">
+   <h1 class="center-text glitch is-glitching Ubuntu-font" data-text="雨过天晴&伞落人离's Blog">雨过天晴&伞落人离's Blog</h1>
+</div>
+      <div class="header-info">
+        <p>一沙一世界，一花一天堂。君掌盛无边，刹那成永恒。</p>
+        <div class="top-social_v2">
+          <li id="bg-pre">
+            <img class="flipx" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
+          </li>
+          
+            
+              
+                <li>
+                  <a href="http://github.com/honjun" target="_blank" class="social-github" title="github">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/github.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="sina">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/sina.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="wangyiyun">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wangyiyun.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="zhihu">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/zhihu.png">
+                  </a>
+                </li>
+              
+            
+              
+                <li>
+                  <a href="http://weibo.com/mashirozx?is_all=1" target="_blank" class="social-github" title="email">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/email.svg">
+                  </a>
+                </li>
+              
+            
+              
+                <li class="wechat">
+                  <a href="/#">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wechat.png">
+                  </a>
+                  <div class="wechatInner">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/wechat.jpg">
+                  </div>
+                </li>
+              
+            
+              
+                <li class="wechat">
+                  <a href="/#">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/wechat.png">
+                  </a>
+                  <div class="wechatInner">
+                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/wechat.jpg">
+                  </div>
+                </li>
+              
+            
+          
+          <li id="bg-next">
+            <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
+          </li>
+        </div>
+      </div>
+    </div>
+  </figure>
+  <div id="video-container" style="">
+    <video style="object-fit: fill" id="bgvideo" class="video" video-name="" src="" width="auto" preload="auto">
+    </video>
+    <div id="video-btn" class="loadvideo videolive">
+    </div>
+    <div id="video-add">
+    </div>
+    <div class="video-stu">
+    </div>
+  </div>
+  <div class="headertop-down faa-float animated" onclick="headertop_down()">
+    <span>
+      <i class="fa fa-chevron-down" aria-hidden="true">
+      </i>
+    </span>
+  </div>
+</div>
+    <div id="page" class="site wrapper">
+      <header class="site-header no-select gizle sabit" role="banner">
+  <div class="site-top">
+    <div class="site-branding">
+      <span class="site-title">
+        <span class="logolink moe-mashiro">
+          <a href="/">
+            <span class="sakurasono"></span>
+            <span class="shironeko">雨过天晴&amp;伞落人离&#39;s Blog</span>
+          </a>
+        </span>
+      </span>
+    </div>
+    <div class="searchbox search-form-submit">
+      <i class="iconfont js-toggle-search iconsearch icon-search">
+      </i>
+    </div>
+    <div id="show-nav" class="showNav mobile-fit">
+      <div class="line line1">
+      </div>
+      <div class="line line2">
+      </div>
+      <div class="line line3">
+      </div>
+    </div>
+    <div class="lower-cantiner">
+      <div class="lower">
+        <nav class="mobile-fit-control hide">
+          <ul id="menu-new" class="menu">
+            
+              <li>
+                <a href="/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-fort-awesome faa-shake" aria-hidden="true"></i>
+                    首页
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/archives">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-archive faa-shake" aria-hidden="true"></i>
+                    归档
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/categories/%E6%8A%80%E6%9C%AF/">
+                          <i class="fa fa-code" aria-hidden="true"></i>
+                          技术
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E7%94%9F%E6%B4%BB/">
+                          <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                          生活
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E8%B5%84%E6%BA%90/">
+                          <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                          资源
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E9%9A%8F%E6%83%B3/">
+                          <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                          随想
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/categories/%E8%BD%AC%E8%BD%BD/">
+                          <i class="fa fa-book" aria-hidden="true"></i>
+                          转载
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="javascript:;">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-list-ul faa-vertical" aria-hidden="true"></i>
+                    清单
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/tags/%E6%82%A6%E8%AF%BB/">
+                          <i class="fa fa-th-list faa-bounce" aria-hidden="true"></i>
+                          书单
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/bangumi/">
+                          <i class="fa fa-film faa-vertical" aria-hidden="true"></i>
+                          番组
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/music/">
+                          <i class="fa fa-headphones" aria-hidden="true"></i>
+                          歌单
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/tags/%E5%9B%BE%E9%9B%86/">
+                          <i class="fa fa-photo" aria-hidden="true"></i>
+                          图集
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="/comment/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-pencil-square-o faa-tada" aria-hidden="true"></i>
+                    留言板
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/links/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-link faa-shake" aria-hidden="true"></i>
+                    友人帐
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/donate/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-heart faa-pulse" aria-hidden="true"></i>
+                    赞赏
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-leaf faa-wrench" aria-hidden="true"></i>
+                    关于
+                  </span>
+                </a>
+                
+                  <ul class="sub-menu">
+                    
+                      <li>
+                        <a href="/about/">
+                          <i class="fa fa-meetup" aria-hidden="true"></i>
+                          我？
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/theme-sakura/">
+                          <i class="fa iconfont icon-sakura" aria-hidden="true"></i>
+                          主题
+                        </a>
+                      </li>
+                    
+                      <li>
+                        <a href="/lab/">
+                          <i class="fa fa-cogs" aria-hidden="true"></i>
+                          Lab
+                        </a>
+                      </li>
+                    
+                  </ul>
+                
+              </li>
+            
+              <li>
+                <a href="/client/">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-android faa-vertical" aria-hidden="true"></i>
+                    客户端
+                  </span>
+                </a>
+                
+              </li>
+            
+              <li>
+                <a href="/atom.xml">
+                  <span class="faa-parent animated-hover">
+                    <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
+                    RSS
+                  </span>
+                </a>
+                
+              </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+<div class="pattern-center-blank"></div>
+
+<div id="content" class="site-content">
+  <div id="primary" class="content-area">
+    <main id="main" class="site-main" role="main">
+      <article id="post-1" class="post-1 post type-post status-publish format-standard has-post-thumbnail hentry category-uncategorized">
+        <div class="toc"></div>
+        <!--<div class="toc-entry-content"><!-- 套嵌目录使用（主要为了支援评论）-->
+        
+          <header class="entry-header">
+            <h1 class="entry-title">初识dll热补丁</h1>
+            <p class="entry-census">&nbsp;·&nbsp;2021-3-31&nbsp;·&nbsp;<span id="busuanzi_value_page_pv"></span>次阅读</p></p>
+
+            <hr>
+          </header>
+        
+        <div class="entry-content">
+          <p>寒假皮条侠给了我个单子需求大概是这样</p>
+<p><a target="_blank" rel="noopener" href="http://106.15.74.181/wp-content/uploads/2021/03/Assignment_2020-21-1.pdf">英文原版<br>Assignment_2020-21-1</a><a target="_blank" rel="noopener" href="http://106.15.74.181/wp-content/uploads/2021/03/Assignment_2020-21-1.pdf">下载</a></p>
+<p>中文翻译版</p>
+<p><a target="_blank" rel="noopener" href="http://106.15.74.181/wp-content/uploads/2021/03/Assignment_2020-21-%E4%B8%AD%E6%96%87%E6%8F%8F%E8%BF%B0.docx">Assignment_2020-21-中文描述</a><a target="_blank" rel="noopener" href="http://106.15.74.181/wp-content/uploads/2021/03/Assignment_2020-21-%E4%B8%AD%E6%96%87%E6%8F%8F%E8%BF%B0.docx">下载</a></p>
+<p>大概就是模拟一个工业控制器，这个控制器在运行中若收到某信号，则温度算法需要改变，但是不能停机，同时需要新算法和旧算法的交接是渐进的。再通俗点就是在不关闭程序的情况下替换函数。最后在皮条侠指点下，我选择用dll/so动态加载来解决这个问题具体代码如下</p>
+<p>main.c</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;math.h&gt;
+#include &lt;unistd.h&gt;
+int control_function(const unsigned k, double* u)
+    &#123;
+*(u) = sin((double)k / 50.0);          // 计算设备的输入
+return 0;
+&#125;                            // control_function()
+int main() 
+&#123;
+    unsigned t = 0;
+double u;
+while(1)
+       &#123;
+       if(control_function(t, &amp;u) == -1)
+&#123;
+printf(&quot;control_function failed\n&quot;);
+           exit(-1);
+           &#125;
+
+printf(&quot;%lf @ %u\n&quot;, u, t);               // 模拟该控制器的输入u 到设备
+           t++;                              // Increment time index
+           sleep(1);             // Sampling time... maybe 10-15 minutes in practice
+&#125;
+return 0;                     // Should never reach here!
+&#125;                           // main())
+</code></pre>
+<p>这个u的值就是模拟的温度值，control_function就是温度控制算法，也就是需要可以被动态替换的</p>
+<p>以下是我的方案</p>
+<p>main.c</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;dlfcn.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;string.h&gt;
+#define SERV_PORT 9000
+int(*old_control_function)(const unsigned , double*); // define the function pointer
+
+int(*control_function)(const unsigned , double*); // define the function pointer for progressive substitution
+
+const char* dllPath=&quot;./controller.so&quot;; // controller.so is the default so file for the program to run for the default algorithm
+
+int initialize_status=0 , no_load=1 , reload_status=0; //set default so file  detect reload so file status  control progressive stage
+
+double cnt=0.1;
+// misc variables
+const char dir_path[]=&quot;./&quot;;
+char new_file_path[2048];
+
+_Noreturn void * Listener()
+&#123;
+    struct sockaddr_in serv_addr,client_addr;
+    socklen_t addr_len;
+    char buf[2048];
+    //AF_INET:ipv4 SOCK_DGRAM 0: default protocol(udp/tcp)
+    int skt=socket(AF_INET,SOCK_STREAM,0);
+    bzero(&amp;serv_addr,sizeof(serv_addr));
+    serv_addr.sin_family=AF_INET;
+    serv_addr.sin_port=htons(SERV_PORT);
+    serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+    bind(skt,(struct sockaddr *)&amp;serv_addr,sizeof(serv_addr));
+    listen(skt,10);
+    addr_len=sizeof(client_addr);
+    char reply[]=&quot;Successfully received your call\n&quot;;
+    char verify[]=&quot;Emergency\n&quot;;
+    char reply_verify[]=&quot;Please input new so file name\n&quot;;
+    memset(buf,&#39;\0&#39;,sizeof(buf));
+    while(1)
+    &#123;
+        int client_skt=accept(skt,(struct sockaddr *)&amp;client_addr,&amp;addr_len);
+        int len=recv(client_skt,buf,sizeof(buf),0);
+        printf(&quot;%s\n&quot;,buf);
+        printf(&quot;%s\n&quot;,verify);
+        len=send(client_skt,reply,strlen(reply),0);
+        //printf(&quot;strcmp(a, b) : %d\n&quot;, strcmp(buf, verify));
+        if(strcmp(buf,verify)==0)
+        &#123;
+            printf(&quot;will reload the so file for emergency situation\n&quot;);
+            len=send(client_skt,reply_verify,strlen(reply_verify),0);
+            memset(buf,&#39;\0&#39;,sizeof(buf));
+            len=recv(client_skt,buf,sizeof(buf),0);
+            strtok(buf,&quot;\n&quot;);
+            memcpy(new_file_path,dir_path,sizeof(dir_path));
+            strcat(new_file_path,buf);
+            initialize_status=0;
+        &#125;
+        memset(buf,&#39;\0&#39;,sizeof(buf));
+        close(client_skt);
+    &#125;
+
+&#125;
+
+int check_so()
+&#123;
+    old_control_function=control_function;
+    void *handle = dlopen((char *) dllPath, RTLD_LAZY);
+    if(no_load==0)
+    &#123;
+        printf(&quot;%s\n&quot;,new_file_path);
+        handle=dlopen((char *)new_file_path,RTLD_LAZY);
+    &#125;
+
+    if(!handle)
+    &#123;
+        printf(&quot;Error occurred while trying to load so file\n&quot;);
+        return -1;
+
+    &#125;
+    control_function=dlsym(handle,&quot;control_function&quot;);
+    if(!control_function)
+    &#123;
+        printf(&quot;error occurred while load the function\n&quot;);
+        return -1;
+    &#125;
+    if(no_load==0)
+    &#123;
+        reload_status=1;
+    &#125;
+    no_load=0;
+    return 0;
+&#125;
+
+int main()
+&#123;
+
+    unsigned t = 0;
+    double u;
+    pthread_t thread[1];
+
+    int res = pthread_create(&amp;thread[0], NULL, Listener,NULL);
+
+    while(1)
+    &#123;
+        if(initialize_status==0) // reload module
+        &#123;
+            if(check_so()!=0)
+            &#123;
+                if(no_load==1)
+                &#123;
+                    printf(&quot;Failed to initializing so file&quot;);
+                    return 0;
+                &#125;else
+                &#123;
+                    printf(&quot;Something went wrong while trying to replace so file\n&quot;);
+                &#125;
+
+            &#125;else printf(&quot;so file loaded successfully\n&quot;);
+
+            initialize_status=1;
+
+        &#125;
+        if(reload_status==1) // if reloaded so file enter progressive mode
+        &#123;
+            double temp1,temp2;
+            double mix_value;
+
+            old_control_function(t, &amp;temp1);
+            control_function(t, &amp;temp2);
+            printf(&quot;old function run result as %lf\n&quot;,temp1);
+            printf(&quot;new function run result as %lf\n&quot;,temp2);
+            mix_value=(1-cnt)*temp1+cnt*temp2;  // generate progressive value
+            cnt+=0.1;
+            printf(&quot;Progressive value for Emergency substitution is %lf @ %u\n&quot;, mix_value, t);
+            if(cnt&gt;=1)
+            &#123;
+                printf(&quot;progressive stage end here\n&quot;);
+                reload_status=0;   // end of progressive substitution
+            &#125;
+            t++;                              // Increment time index
+            sleep(1);
+            continue;
+        &#125;
+        if(control_function(t, &amp;u) == -1)
+        &#123;
+            printf(&quot;control_function failed\n&quot;);
+            exit(-1);
+        &#125;
+
+        printf(&quot;%lf @ %u\n&quot;, u, t);               // simulate input as u
+        t++;                              // Increment time index
+        sleep(1);             // Sampling time... maybe 10-15 minutes in practice
+    &#125;
+    return 0;                     // Should never reach here!
+&#125;                           // main())
+
+
+
+//gcc main.c -o -dl
+</code></pre>
+<p>contrller.c (老的温度函数)</p>
+<pre><code>#include &lt;math.h&gt;
+int control_function(const unsigned k, double* u)
+&#123;
+    *(u) = sin((double)k / 50.0);          // simulate input algorithm
+    return 0;
+&#125;
+//gcc -fPIC -shared controller.c -o controller.so -lm
+</code></pre>
+<p>new_controller.c（新的温度函数）</p>
+<pre><code>int control_function(const unsigned k, double* u)
+&#123;
+    *(u) = 3.141592;          // simulate input algorithm
+    return 0;
+&#125;
+
+//gcc -fPIC -shared new_controller.c -o new_controller.so -lm
+</code></pre>
+<p>将函数源代码提前编译成动态链接库，在main.c启动后会默认加载controller.so文件，当程序监听到socket被链接，确认需要更换并得到文件名new_controller.so后便会在工作目录加载，同时温度值会为</p>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/%E5%9B%BE%E7%89%87.png"></p>
+<p>其中λ是和时间相关的系数，这样便可以做到渐进式替换的效果。</p>
+<hr>
+<p>具体的报告</p>
+<h3 id="course-exercise"><a href="#course-exercise" class="headerlink" title="course-exercise"></a>course-exercise</h3><h4 id="Structure"><a href="#Structure" class="headerlink" title="Structure"></a>Structure</h4><p>Detailed the function and how it does</p>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/Industrial-Controller-1024x362.png"></p>
+<h4 id="Idea"><a href="#Idea" class="headerlink" title="Idea"></a>Idea</h4><h5 id="Using-memcpy-function"><a href="#Using-memcpy-function" class="headerlink" title="-Using memcpy function"></a>-Using memcpy function</h5><p>I assume the program is designed for a chemical industry machine which need the program to generate output to control the temperature. Maybe at one point the machine need to adjust the temperature function and during the process of substitution . This process can be regarded as a Hot Fix. To achieve this I came out many methods such as start another program from the previous one, recompile the program. And The Linux kernel has a function replacement function, such as the memcpy function. There are various versions. The performance of different versions is different in different CPUs. When the kernel starts, it will patch dynamically according to the type of CPU. The method is to add an empty instruction at the beginning of the memcpy function. The length of the instruction can put down a jump instruction. X86 has different lengths of empty instructions. Then, according to the specific CPU, select the fastest version of memcpy and jump to the new function. In this way, new and old code can coexist and jump to new code with jump command.</p>
+<p><img src="https://www.ibm.com/developerworks/cn/linux/l-knldebug/images/2.gif" alt="img"></p>
+<p>And to keep that work.</p>
+<p>(1) When the original function is being replaced, that is, when the replacement core module is inserted, it is not used by other processes, otherwise the result may cause the phenomenon of inconsistent kernel state.</p>
+<p>(2) The replacement function and the original function have the same parameter list, and the corresponding order of parameter types are the same, the number of parameters is the same, and the function has the same return value. In general, the purpose of replacing a core function is not to change its function, but to track whether the execution flow of the function is abnormal, and whether the variables and parameters have the expected values. Therefore, the replacement function and the original function have the same function.</p>
+<p>To get the address of the function we need to know. We need to customize our own replacement function before we can replace it, and we must be able to find the address of the replacement function in the runtime core (via System.map or /proc/ksyms). In addition, before replacing the function on the target computer, it is best to first pass the test on other nodes with the same hardware platform and operating system core, because the replacement function written by oneself often has some problems and can not pass at one time, so as not to cause unnecessary trouble.</p>
+<p>The purpose or desired effect of dynamically replacing the kernel content is to change the original execution flow of the kernel and to jump to our own custom function flow. As you can see from the schematic of the above function call, there are three places to start with function replacement.</p>
+<p>(1) Modify the stack</p>
+<p>However, this method can only modify the parameters and return address of the function execution, and can not achieve the purpose of changing the execution process;</p>
+<p>(2) Modify the content of the program counter</p>
+<p>There is no way to assign EIP directly within the operating system and no such code is provided.</p>
+<p>(3) modify the original function code</p>
+<p>When a function is called, the value of eip will point to the starting address of the code of the called function, and the value of the next point of eip will be determined based on the first instruction of the function. So we can change the first part of the original function code to jump the contents of the eip to the alternative function code we provide, without leaving the existing stack content unchanged.</p>
+<p>There are two instructions in the instruction set that can jump the execution flow of a program: CALL and JMP.</p>
+<p>Call is a function call instruction. Before a call can be executed, we need to set the parameters of the function on the stack. In this case, because the parameters have been set before entering the original function, we must copy these parameters to the top of the stack. This copying process involves stack addresses related to the number of arguments, so different functions need to be recalculated, more prone to error.</p>
+<p>JMP makes a normal jump (similar to the GOTO statement in C language), and can continue to use the arguments prepared by the original function and the return address information, without having to copy the contents of the stack again, so it is relatively safe and convenient to implement.</p>
+<p><img src="https://www.ibm.com/developerworks/cn/linux/l-knldebug/images/2.gif" alt="img"></p>
+<p>The whole replacement process is completed by a core module. When the core module initializes, it replaces the instruction code at the beginning of the original function func with the jump instruction code, making this part of the code become an instruction to the function replace_func. At the same time to finally be able to restore function func, antiderivatives instruction code of the substituted part must be preserved, so that when we achieve the desired purpose after uninstall the module, can be used to save the order code to cover the original address, so that when the subsequent kernel executive function func again, they can continue to perform the function of the original code, does not destroy the kernel of the state.</p>
+<h5 id="Livepatch"><a href="#Livepatch" class="headerlink" title="-Livepatch"></a>-Livepatch</h5><p>Livepatch is a tool for hotpatching run-time processes. It can easily modify the variables in the running process, but also can easily replace the functions in the running process, using a new library function to replace the original function in the main process.</p>
+<ul>
+<li>  Kernel probes（Kprobes）</li>
+<li>  Function tracing（Ftrace）</li>
+<li>  Livepatching（livepatch）</li>
+</ul>
+<p>And not all the system support this mechanism the supported OS are as followed:</p>
+<ul>
+<li>  Arch Linux（livepatch，kpatch-git tool）</li>
+<li>  Debian（Debian 9）</li>
+<li>  Gentoo（<a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=https://wiki.gentoo.org/wiki/Live_patching">kpatch or ksplice</a>）</li>
+<li>  Oracle Linux（ksplice）</li>
+<li>  RedHat Linux 7（kpatch or ksplice）</li>
+<li>  SUSE（kGraft）</li>
+<li>  Ubuntu 16.04 or higher（livepatch）</li>
+</ul>
+<p>If we take this method as a resolution. We will have to consider the following problems.</p>
+<ul>
+<li>  We want to be able to change the behavior of our program while it is running.</li>
+<li>  How new program behavior is dynamically added to process memory. We want to be able to change the behavior of our program while it is running.</li>
+<li>  How to replace the behavior of a function with a new behavior.</li>
+<li>  If the function you need to change is static, can you change it this way?</li>
+<li>  How can a new function call other functions in the original process? How do I access existing global variables? How do I access static functions and static global variables? If the function you need to change is static, can you change it this way?</li>
+</ul>
+<h5 id="Final-Call"><a href="#Final-Call" class="headerlink" title="-Final Call"></a>-Final Call</h5><p>So all of these can be considered as disadvantages of manually replace the ole function with the new one. It is hard and may cause unstableness or other problems that may be unexpected.</p>
+<p>On this condition I think using DLL is the easiest way to solve this. Under Unix OS environment I use dlfcn,h to load and use the external .so file. And by using the Unix system function such as Socket and dlfcn part. All of these are widely used in embedded system.</p>
+<h4 id="Detail"><a href="#Detail" class="headerlink" title="Detail"></a>Detail</h4><p>At the out set of the detail report. I want to make it clear that I achieve the goal of the exercise using DLL(Dynamic Linking Lib) Module and socket communication. The program will dynamically load the function form the specified .so file. The timing of changing the .so file to replace the old function and old .so file is controlled by the socket module. So basically, the program listening on port 9000 for signal of hot fix request, when receive the signal it will try to load the new so file. If nothing goes wrong, the program will go to progressive introduce stage which using the function</p>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/%E5%9B%BE%E7%89%87.png"></p>
+<p>u is a mix value using the old controller function and new controller function which will make the procedure more smooth. As for the error part, the program has its mechanism of error caught part, if the default .so file cannot be loaded the program will go end directly. But if the new .so file fail to load the whole program will use the initial .so file and keep everything unchanged. So in the case of one thread for main situation this program can keep the control algorithm to steadily changed without any error that may result the stop of the control program.</p>
+<pre><code>The function dlopen() loads the dynamic shared object (shared
+       library) file named by the null-terminated string filename and
+       returns an opaque &quot;handle&quot; for the loaded object.  This handle is
+       employed with other functions in the dlopen API, such as
+       dlsym(3), dladdr(3), dlinfo(3), and dlclose().
+</code></pre>
+<pre><code>The function dlsym() takes a &quot;handle&quot; of a dynamic loaded shared
+       object returned by dlopen(3) along with a null-terminated symbol
+       name, and returns the address where that symbol is loaded into
+       memory.  If the symbol is not found, in the specified object or
+       any of the shared objects that were automatically loaded by
+       dlopen(3) when that object was loaded, dlsym() returns NULL.
+       (The search performed by dlsym() is breadth first through the
+       dependency tree of these shared objects.)
+
+       In unusual cases (see NOTES) the value of the symbol could
+       actually be NULL.  Therefore, a NULL return from dlsym() need not
+       indicate an error.  The correct way to distinguish an error from
+       a symbol whose value is NULL is to call dlerror(3) to clear any
+       old error conditions, then call dlsym(), and then call dlerror(3)
+       again, saving its return value into a variable, and check whether
+       this saved value is not NULL.
+</code></pre>
+<pre><code>  socket() creates an endpoint for communication and returns a file
+       descriptor that refers to that endpoint.  The file descriptor
+       returned by a successful call will be the lowest-numbered file
+       descriptor not currently open for the process.
+
+       The domain argument specifies a communication domain; this
+       selects the protocol family which will be used for communication.
+       These families are defined in &lt;sys/socket.h&gt;.  The formats
+       currently understood by the Linux kernel include:
+</code></pre>
+<p>JUST USING THE ON HAND FUNCTION IS ABSOLUTELY BETTER CHOICE</p>
+<p>that’s why I USE THIS WAY</p>
+<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><ul>
+<li>  Default .so loading</li>
+</ul>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/image-20210205160729053-1024x597.png"></p>
+<ul>
+<li>  How to change .so file use <code>nc 127.0.0.1 9000</code> as a signal to contact socket listener</li>
+</ul>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/image-20210205160909274-1024x490.png"></p>
+<ul>
+<li>  .so reload and progressive introduce start</li>
+</ul>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/image-20210205160952768.png"></p>
+<p>The old function keep working and generating output continuously during the reload process</p>
+<p>THE WHOLE PROCESS CAN BE SEEN ABOVE or you you seek deeper <em>JUST CHECK</em> the source code at the out set of the report</p>
+<ul>
+<li>  End of progressive introduce stage</li>
+</ul>
+<p><img src="http://106.15.74.181/wp-content/uploads/2021/03/image-20210205161211343.png"></p>
+<p>You can easily see what happen above , if you seek more just run the program within the whole package plz.</p>
+<p>After that the output will only be generated by the newly replaced function</p>
+<hr>
+<p>通过这次小作业，学习了dll的载入，c的socket编写，并对这种动态替换，热更新技术做了有限且初步的了解</p>
+
+        </div>
+        <!-- .entry-content -->
+        <div class="single-reward">
+          <div class="reward-open">赏
+            <div class="reward-main">
+              <ul class="reward-row">
+                <li class="alipay-code"><img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/donate/AliPayQR.jpg"></li>
+                <li class="wechat-code"><img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/donate/WeChanQR.jpg"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; width: 100%" class="social-share share-mobile" data-disabled="diandian, tencent"></div>
+        <footer class="post-footer">
+          <div class="post-lincenses"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="nofollow"><i class="fa fa-creative-commons" aria-hidden="true"></i> 知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a></div>
+          <div class="post-tags">
+          </div>
+          <div class="post-share">
+            <div class="social-share sharehidden share-component"></div>
+            <i class="iconfont show-share icon-forward"></i>
+          </div>
+        </footer><!-- .entry-footer -->
+      </article>
+      <!-- #post-## -->
+      <div class="toc" style="background: none;"></div>
+      <section class="post-squares nextprev">
+        
+          
+            <div class="post-nepre half previous">
+          
+            <a href="/2021/04/19/%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="prev">
+              <div class="background">
+                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Previous Post</span>
+              <div class="info">
+                <h3>
+                并行编程学习</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+        
+          
+            <div class="post-nepre half next">
+          
+            <a href="/2021/03/30/php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9C%A8ctf%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" rel="next">
+              <div class="background">
+                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Next Post</span>
+              <div class="info">
+                <h3>
+                php反序列化在CTF中的应用</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+      </section>
+      
+<div id="vcomments"></div>
+<script>
+  window.onload = function(){
+      var valine = new Valine();
+      valine.init({
+        el: '#vcomments',
+        appId: "GyC3NzMvd0hT9Yyd2hYIC0MN-gzGzoHsz",
+        appKey: "mgOpfzbkHYqU92CV4IDlAUHQ",
+        path: window.location.pathname,
+        placeholder: "你是我一生只会遇见一次的惊喜 ..."
+      })
+  }
+</script>
+
+      <section class="author-profile">
+        <div class="info" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+          <a href="" class="profile gravatar"><img src="" itemprop="image" alt="" height="70" width="70"></a>
+          <div class="meta">
+            <span class="title">Author</span>
+            <h3 itemprop="name">
+            <a href="" itemprop="url" rel="author"></a>
+            </h3>
+          </div>
+        </div>
+        <hr>
+        <p><i class="iconfont icon-write"></i></p>
+      </section>
+    </main><!-- #main -->
+  </div><!-- #primary -->
+</div>
+
+
+
+    </div>    
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..."/>
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            // PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+    <!-- <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 John Doe<br>
+      powered_by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer> -->
+<footer id="colophon" class="site-footer" role="contentinfo">
+  <div class="site-info">
+    <div class="footertext">
+      <div class="img-preload">
+        <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/wordpress-rotating-ball-o.svg">
+        <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/disqus-preloader.svg">
+      </div>
+      <p style="color: #666666;">&copy 2018</p>
+    </div>
+    <div class="footer-device">
+    <p style="font-family: 'Ubuntu', sans-serif;">
+        <span style="color: #b9b9b9;">Theme <a href="https://github.com/honjun/hexo-theme-sakura" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Sakura</a> <i class="iconfont icon-sakura rotating" style="color: #ffc0cb;display:inline-block"></i> by <a href="https://2heng.xin/" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Mashiro</a>&<a href="https://www.hojun.cn/" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Hojun</a>, Powered by Hexo, Hosted by Coding Pages</a>
+        </span>
+      </p>
+    </div>
+  </div><!-- .site-info -->
+</footer>
+
+
+
+<!-- <script src="/js/tocbot.js"></script> -->
+<script type="text/javascript" src="/js/lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script type="text/javascript" src="/js/InsightSearch.js"></script>
+<script type="text/javascript" src="/js/jquery.fancybox.min.js"></script>
+<script type="text/javascript" src="/js/zoom.min.js"></script>
+<script type="text/javascript" src="/js/sakura-app.js"></script>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//unpkg.com/valine@1.3.4/dist/Valine.min.js'></script>
+<script src="/js/botui.js"></script>
+<!-- 不蒜子 网页计数器 -->
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script> -->
+<script type="text/javascript">
+/* <![CDATA[ */
+if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  var Poi = {"pjax":"1","movies":{"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2","name":"Unbroken.mp4","live":"close"},"windowheight":"fixed","codelamp":"close","ajaxurl":"","order":"asc","formpostion":"bottom"};
+} else {
+  var Poi = {"pjax":"1","movies":{"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2","name":"Unbroken.mp4","live":"open"},"windowheight":"auto","codelamp":"close","ajaxurl":"","order":"asc","formpostion":"bottom"};
+}
+/* ]]> */
+
+</script>
+<script>
+$(document).ready(function() {
+  if ($(".toc").length > 0 && document.body.clientWidth > 1200) {
+    if ($(".pattern-center").length > 0) { //有图的情况
+      tocbot.init({
+          // Where to render the table of contents.
+          tocSelector: '.toc', // 放置目录的容器
+          // Where to grab the headings to build the table of contents.
+          contentSelector: '.entry-content', // 正文内容所在
+          // Which headings to grab inside of the contentSelector element.
+          scrollSmooth: true,
+          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
+          headingsOffset: -400,
+          scrollSmoothOffset: -85
+      });
+    } else {
+      tocbot.init({
+          // Where to render the table of contents.
+          tocSelector: '.toc', // 放置目录的容器
+          // Where to grab the headings to build the table of contents.
+          contentSelector: '.entry-content', // 正文内容所在
+          // Which headings to grab inside of the contentSelector element.
+          scrollSmooth: true,
+          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
+          headingsOffset: -85,
+          scrollSmoothOffset: -85
+      });
+    }
+    var offsetTop = $('.toc').offset().top - 95;
+    window.onscroll = function() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+      if (scrollTop >= offsetTop) {
+        $('.toc').addClass('toc-fixed');
+      } else {
+        $('.toc').removeClass('toc-fixed');
+      }
+    }
+  }
+});
+</script>
+<!-- 🌸飘落 -->
+<script src="https://cdn.jsdelivr.net/gh/wallleap/cdn@latest/js/sakura.js"></script>
+    <div class="openNav no-select" style="height: 50px;">
+      <div class="iconflat no-select" style="width: 50px; height: 50px;">
+        <div class="icon"></div>
+      </div>
+      <div class="site-branding search-form-submit">
+        <i class="iconfont js-toggle-search iconsearch icon-search"></i>
+      </div>
+    </div>
+  </section>
+  <div class="skin-menu no-select" id="mainskin" style="position: fixed">
+ <div class="theme-controls row-container">
+  <ul class="menu-list">
+   <li id="white-bg"> <i class="fa fa-television" aria-hidden="true"></i></li>
+   <li id="sakura-bg"> <i class="iconfont icon-sakura"></i></li>
+   <li id="gribs-bg"> <i class="fa fa-slack" aria-hidden="true"></i></li>
+   <li id="KAdots-bg"> <i class="iconfont icon-dots"></i></li>
+   <li id="totem-bg"> <i class="fa fa-optin-monster" aria-hidden="true"></i></li>
+   <li id="pixiv-bg"> <i class="iconfont icon-pixiv"></i></li>
+   <li id="bing-bg"> <i class="iconfont icon-bing"></i></li>
+   <li id="dark-bg"> <i class="fa fa-moon-o" aria-hidden="true"></i></li>
+  </ul>
+ </div>
+</div>
+<canvas id="night-mode-cover"></canvas> 
+  <div class="changeSkin-gear no-select">
+  <div class="keys" id="setbtn"> 
+   <span id="open-skinMenu"> 切换主题 | SCHEME TOOL  
+     <i class="iconfont icon-gear inline-block rotating"></i> 
+   </span>
+  </div>
+</div>
+  <div id="mo-nav" class="">
+  <div class="m-avatar">
+    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/custom/avatar.jpg">
+  </div>
+  <p style="text-align: center; color: #333; font-weight: 900; font-family: 'Ubuntu', sans-serif; letter-spacing: 1.5px">雨过天晴&伞落人离's Blog</p>
+  <p style="text-align: center; word-spacing: 20px;">
+    
+      
+        <a href="http://github.com/honjun" class="fa fa-github" target="_blank" style="color: #333; margin-left:20px"></a>
+      
+        <a href="http://weibo.com/mashirozx?is_all=1" class="fa fa-weibo" target="_blank" style="color: #dd4b39; margin-left:20px"></a>
+      
+        <a href="https://wpa.qq.com/msgrd?v=3&uin=954655431&site=qq&menu=yes" class="fa fa-qq" target="_blank" style="color: #25c6fe; margin-left:20px"></a>
+      
+    
+  </p>
+  <ul id="menu-new-1" class="menu">
+    
+      <li>
+        <a href="/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-fort-awesome faa-shake" aria-hidden="true"></i>
+            首页
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/archives">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-archive faa-shake" aria-hidden="true"></i>
+            归档
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/categories/%E6%8A%80%E6%9C%AF/">
+                  <i class="fa fa-code" aria-hidden="true"></i>
+                  技术
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E7%94%9F%E6%B4%BB/">
+                  <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                  生活
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E8%B5%84%E6%BA%90/">
+                  <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                  资源
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E9%9A%8F%E6%83%B3/">
+                  <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                  随想
+                </a>
+              </li>
+            
+              <li>
+                <a href="/categories/%E8%BD%AC%E8%BD%BD/">
+                  <i class="fa fa-book" aria-hidden="true"></i>
+                  转载
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="javascript:;">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-list-ul faa-vertical" aria-hidden="true"></i>
+            清单
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/tags/%E6%82%A6%E8%AF%BB/">
+                  <i class="fa fa-th-list faa-bounce" aria-hidden="true"></i>
+                  书单
+                </a>
+              </li>
+            
+              <li>
+                <a href="/bangumi/">
+                  <i class="fa fa-film faa-vertical" aria-hidden="true"></i>
+                  番组
+                </a>
+              </li>
+            
+              <li>
+                <a href="/music/">
+                  <i class="fa fa-headphones" aria-hidden="true"></i>
+                  歌单
+                </a>
+              </li>
+            
+              <li>
+                <a href="/tags/%E5%9B%BE%E9%9B%86/">
+                  <i class="fa fa-photo" aria-hidden="true"></i>
+                  图集
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="/comment/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-pencil-square-o faa-tada" aria-hidden="true"></i>
+            留言板
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/links/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-link faa-shake" aria-hidden="true"></i>
+            友人帐
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/donate/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-heart faa-pulse" aria-hidden="true"></i>
+            赞赏
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-leaf faa-wrench" aria-hidden="true"></i>
+            关于
+          </span>
+        </a>
+        
+          <ul class="sub-menu">
+            
+              <li>
+                <a href="/about/">
+                  <i class="fa fa-meetup" aria-hidden="true"></i>
+                  我？
+                </a>
+              </li>
+            
+              <li>
+                <a href="/theme-sakura/">
+                  <i class="fa iconfont icon-sakura" aria-hidden="true"></i>
+                  主题
+                </a>
+              </li>
+            
+              <li>
+                <a href="/lab/">
+                  <i class="fa fa-cogs" aria-hidden="true"></i>
+                  Lab
+                </a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+      <li>
+        <a href="/client/">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-android faa-vertical" aria-hidden="true"></i>
+            客户端
+          </span>
+        </a>
+        
+      </li>
+    
+      <li>
+        <a href="/atom.xml">
+          <span class="faa-parent animated-hover">
+            <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
+            RSS
+          </span>
+        </a>
+        
+      </li>
+    
+  </ul>
+  <p style="text-align: center; font-size: 13px; color: #b9b9b9;">&copy 2019 hexo-sakura</p>
+</div>
+<button onclick="topFunction()" class="mobile-cd-top" id="moblieGoTop" title="Go to top" style="display: none;"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<!-- require MetingJS -->
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+<style>
+  .aplayer .aplayer-lrc {
+    height: 35px;
+  }
+  .aplayer .aplayer-lrc p{
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 18px !important;
+  }
+  .aplayer .aplayer-lrc p.aplayer-lrc-current{
+    color: #FF1493;
+  }
+  .aplayer.aplayer-narrow .aplayer-body{
+    left: -66px !important;
+  }
+  .aplayer.aplayer-fixed .aplayer-lrc {
+    display: none;
+  }
+  .aplayer .aplayer-lrc.aplayer-lrc-hide {
+      display:none !important;
+  }
+  .aplayer.aplayer-fixed .lrc-show {
+    display: block;
+    background: rgba(255, 255, 255, 0.8);
+  }
+</style>
+<meting-js
+
+    id="606130066"
+
+    server="netease"
+
+    type="playlist"
+
+    fixed="true"
+
+    autoplay="false"
+
+    loop="all"
+
+    order="random"
+
+    preload="auto"
+
+    volume="0.7"
+
+    mutex="true"
+
+</meting-js>
+<script>
+  $(function(){
+    $('body').on('click', '.aplayer', function(){
+      if($('.aplayer-button').hasClass('aplayer-play')) {
+        $('.aplayer-lrc').removeClass('lrc-show');
+      } else {
+        $('.aplayer-lrc').addClass('lrc-show');
+      }
+    })
+  });
+</script>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
