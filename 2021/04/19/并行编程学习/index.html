@@ -561,6 +561,42 @@ In Java, the threads you create maintain the software thread abstraction, where 
 </ul>
 <p><img src="http://106.15.74.181/wp-content/uploads/2021/04/image-20210418214823439-1024x440.png"></p>
 <p>数据并行是最简单的一种并行。在这里数据集合被组织为一个常规的结构，比如说数组。许多程序对这个结构的不同部分施以相同操作。设想你要把两个都具有100个元素的数组的对应项相加并将结果储存在新的数组。如果有4个核心（processor）那么每个核心(processor)都可以做25次运算。P.S就这个我觉得最好理解emm</p>
+<hr>
+<p>2021/4/27 更新</p>
+<p>找到一个讲的非常好的各种相关概念的知乎</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/343232126">https://zhuanlan.zhihu.com/p/343232126</a></p>
+<h2 id="上述内容可以归纳总结成下表："><a href="#上述内容可以归纳总结成下表：" class="headerlink" title="上述内容可以归纳总结成下表："></a><strong>上述内容可以归纳总结成下表：</strong></h2><table>
+<thead>
+<tr>
+<th>并发类型</th>
+<th>切换机制</th>
+<th>CPU数量</th>
+<th>适用场景</th>
+<th>代表Python库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>多线程（抢占式多任务处理）</td>
+<td>操作系统决定何时切换任务</td>
+<td>1个</td>
+<td>I/O密集型</td>
+<td>_thread(已淘汰）, threading, cocurrent.futures, nornir</td>
+</tr>
+<tr>
+<td>异步（协作式多任务处理）</td>
+<td>任务本身决定何时切换</td>
+<td>1个</td>
+<td>I/O密集型</td>
+<td>asyncio, netdev, aiohttp, aioping, gevent, tornado, twisted</td>
+</tr>
+<tr>
+<td>多进程 （并行）</td>
+<td>所有任务同时运行</td>
+<td>多个</td>
+<td>CPU密集型</td>
+<td>multiprocessing</td>
+</tr>
+</tbody></table>
 
         </div>
         <!-- .entry-content -->
@@ -589,9 +625,26 @@ In Java, the threads you create maintain the software thread abstraction, where 
       <div class="toc" style="background: none;"></div>
       <section class="post-squares nextprev">
         
+          
+            <div class="post-nepre half previous">
+          
+            <a href="/2021/05/03/python%20IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="prev">
+              <div class="background">
+                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Previous Post</span>
+              <div class="info">
+                <h3>
+                python IO多路复用</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
         
           
-            <div class="post-nepre full next">
+            <div class="post-nepre half next">
           
             <a href="/2021/03/31/%E5%88%9D%E8%AF%86dll%E7%83%AD%E8%A1%A5%E4%B8%81/" rel="next">
               <div class="background">
